@@ -5,6 +5,7 @@
 #include "XSUB.h"
 
 #include "caca.h"
+#include <sys/types.h>
 
 /* ref($object) eq 'HASH' && $object->{__address} */
 void *
@@ -542,7 +543,7 @@ _load_sprite(file)
       if (!sprite) {
         XSRETURN_UNDEF;
       }
-      hv_store(sprite, "__address", 9, newSViv((int) c_sprite), 0);
+      hv_store(sprite, "__address", 9, newSViv((size_t) c_sprite), 0);
       RETVAL = newRV((SV *) sprite);
     }
   OUTPUT:
@@ -675,22 +676,40 @@ _create_bitmap(bpp, w, h, pitch, rmask, gmask, bmask, amask)
       if (!bitmap) {
         XSRETURN_UNDEF;
       }
-      hv_store(bitmap, "__address",  9, newSViv((int) c_bitmap), 0);
-      hv_store(bitmap, "__bpp",      5, newSViv((int) bpp     ), 0);
-      hv_store(bitmap, "__w",        3, newSViv((int) w       ), 0);
-      hv_store(bitmap, "__h",        3, newSViv((int) h       ), 0);
-      hv_store(bitmap, "__pitch",    7, newSViv((int) pitch   ), 0);
-      hv_store(bitmap, "__rmask",    7, newSViv((int) rmask   ), 0);
-      hv_store(bitmap, "__gmask",    7, newSViv((int) gmask   ), 0);
-      hv_store(bitmap, "__bmask",    7, newSViv((int) bmask   ), 0);
-      hv_store(bitmap, "__amask",    7, newSViv((int) amask   ), 0);
+      hv_store(bitmap, "__address",  9, newSViv((size_t) c_bitmap), 0);
+      hv_store(bitmap, "__bpp",      5, newSViv((int)    bpp     ), 0);
+      hv_store(bitmap, "__w",        3, newSViv((int)    w       ), 0);
+      hv_store(bitmap, "__h",        3, newSViv((int)    h       ), 0);
+      hv_store(bitmap, "__pitch",    7, newSViv((int)    pitch   ), 0);
+      hv_store(bitmap, "__rmask",    7, newSViv((int)    rmask   ), 0);
+      hv_store(bitmap, "__gmask",    7, newSViv((int)    gmask   ), 0);
+      hv_store(bitmap, "__bmask",    7, newSViv((int)    bmask   ), 0);
+      hv_store(bitmap, "__amask",    7, newSViv((int)    amask   ), 0);
       RETVAL = newRV((SV *) bitmap);
     }
   OUTPUT:
     RETVAL
 
 void
-_set_bitmap_palette(bitmap, red, green, blue, alpha)
+_set_bitmap_palette_tied(bitmap, red, green, blue, alpha)
+    SV *bitmap;
+    void *red;
+    void *green;
+    void *blue;
+    void *alpha;
+  INIT:
+    struct caca_bitmap *c_bitmap;
+
+    c_bitmap = address_of(bitmap);
+    if (!c_bitmap) {
+      XSRETURN_UNDEF;
+    }
+
+  CODE:
+    caca_set_bitmap_palette(c_bitmap, red, green, blue, alpha);
+
+void
+_set_bitmap_palette_copy(bitmap, red, green, blue, alpha)
     SV *bitmap;
     SV *red;
     SV *green;
@@ -714,6 +733,10 @@ _set_bitmap_palette(bitmap, red, green, blue, alpha)
     c_alpha = (unsigned int *) c_array_32(alpha);
   CODE:
     caca_set_bitmap_palette(c_bitmap, c_red, c_green, c_blue, c_alpha);
+    free(c_red);
+    free(c_green);
+    free(c_blue);
+    free(c_alpha);
 
 void
 _draw_bitmap_tied(x1, y1, x2, y2, bitmap, pixels)
@@ -764,6 +787,7 @@ _draw_bitmap_copy(x1, y1, x2, y2, bitmap, pixels)
     }
   CODE:
     caca_draw_bitmap(x1, y1, x2, y2, c_bitmap, c_pixels);
+    free(c_pixels);
 
 void
 _free_bitmap(bitmap)

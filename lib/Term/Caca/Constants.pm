@@ -1,6 +1,7 @@
 package Term::Caca::Constants;
 
 use strict;
+use warnings;
 use base 'Exporter';
 use vars qw(@EXPORT_OK %EXPORT_TAGS $VERSION);
 

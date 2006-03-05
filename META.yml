@@ -1,15 +1,18 @@
 ---
 name: Term-Caca
-version: 0.9_3
-author: ~
+version: 0.95
+author:
+  - John Beppu E<lt>beppu@cpan.orgE<gt>
 abstract: perl interface for libcaca (Colour AsCii Art library)
-license: lgpl
+license: unrestricted
+requires:
+  Tie::Array::Pointer: 0
 build_requires:
   Test::More: 0
 provides:
   Term::Caca:
     file: lib/Term/Caca.pm
-    version: 0.9_3
+    version: 0.95
   Term::Caca::Bitmap:
     file: lib/Term/Caca/Bitmap.pm
   Term::Caca::Constants:
@@ -25,4 +28,4 @@ provides:
     file: lib/Term/Kaka/Constants.pm
   Term::Kaka::Sprite:
     file: lib/Term/Kaka/Sprite.pm
-generated_by: Module::Build version 0.261
+generated_by: Module::Build version 0.2611

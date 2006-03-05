@@ -1,0 +1,5 @@
+0.95
+  * first release in a long time
+  * added much pod
+  * killed memory leaks
+  * added pod coverage tests

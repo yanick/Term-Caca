@@ -1,4 +1,5 @@
 package Term::Kaka;
+use strict;
 use base 'Term::Caca';
 1;
 

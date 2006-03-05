@@ -2,11 +2,12 @@ package Term::Caca;
 
 require Exporter;
 require DynaLoader;
-$VERSION = '0.9_3';
+$VERSION = '0.95';
 @ISA = qw(Exporter DynaLoader);
 Term::Caca->bootstrap($VERSION);
 
 use strict;
+use warnings;
 use Term::Caca::Constants ':all';
 
 # Basic functions
@@ -353,7 +354,27 @@ sub create_bitmap {
 #
 sub set_bitmap_palette {
   my ($self, $bitmap, $red, $green, $blue, $alpha) = @_;
-  _set_bitmap_palette($bitmap, $red, $green, $blue, $alpha);
+  if (
+    4 == (
+      grep { tied($_) && tied($_)->can('address') }
+        ($red, $green, $blue, $alpha)
+    )
+    )
+  {
+    # If a tied arrayrefs that support the addess() method are sent,
+    # we use the address of the array.
+    _set_bitmap_palette_tied(
+      $bitmap,
+      tied($red)->address,
+      tied($green)->address,
+      tied($blue)->address,
+      tied($alpha)->address
+    );
+  } else {
+    # Otherwise, the arrayref will be copied into a C array before
+    # handing it off to the C function, caca_set_bitmap_palette()
+    _set_bitmap_palette_copy($bitmap, $red, $green, $blue, $alpha);
+  }
 }
 
 #
@@ -361,7 +382,7 @@ sub draw_bitmap {
   my ($self, $x1, $y1, $x2, $y2, $bitmap, $pixels) = @_;
   if (tied($pixels) && tied($pixels)->can('address')) {
     # If a tied arrayref that supports the addess() method is sent,
-    # we use the address of the array
+    # we use the address of the array.
     _draw_bitmap_tied($x1, $y1, $x2, $y2, $bitmap, tied($pixels)->address);
   } else {
     # Otherwise, the arrayref will be copied into a C array before
@@ -388,6 +409,8 @@ Usage:
   use Term::Caca;
   my $caca = Term::Caca->init();
   $caca->putstr(5, 5, "pwn3d");
+  $caca->refresh();
+  sleep 3;
 
 =head1 DESCRIPTION
 
@@ -397,12 +420,143 @@ Usage:
 
 =head3 new
 
-new() is a synonym for init().  These two methods may be used
-interchangably for instantiating Term::Caca objects.
+This method instantiates a Term::Caca object.  (Note that init() is an alias for new()
+and that they may be used interchangeably.)
+
+=head3 set_delay
+
+Set the amount of time in milliseconds between frames to establish
+a constant frame rate
+
+=head3 get_feature
+
+=head3 set_feature
+
+=head3 get_feature_name
+
+=head3 get_rendertime
+
+=head3 get_width
+
+=head3 get_height
+
+=head3 set_window_title
+
+=head3 get_window_width
+
+=head3 get_window_height
+
+=head3 refresh
+
+=head3 get_event
+
+=head3 get_mouse_x
+
+=head3 get_mouse_y
+
+=head3 wait_event
+
+=head3 set_color
+
+=head3 get_fg_color
+
+=head3 get_bg_color
+
+=head3 get_color_name
+
+=head3 putchar
+
+=head3 putstr
+
+=head3 printf
+
+=head3 clear
+
+=head3 draw_line
+
+=head3 draw_polyline
+
+=head3 draw_thin_line
+
+=head3 draw_thin_polyline
+
+=head3 draw_circle
+
+=head3 draw_ellipse
+
+=head3 draw_thin_ellipse
+
+=head3 fill_ellipse
+
+=head3 draw_box
+
+=head3 draw_thin_box
+
+=head3 fill_box
+
+=head3 draw_triangle
+
+=head3 draw_thin_triangle
+
+=head3 fill_triangle
+
+=head3 rand
+
+=head3 sqrt
+
+=head3 load_sprite
+
+=head3 get_sprite_frames
+
+=head3 get_sprite_width
+
+=head3 get_sprite_height
+
+=head3 get_sprite_dx
+
+=head3 get_sprite_dy
+
+=head3 draw_sprite
+
+=head3 free_sprite
+
+=head3 create_bitmap
+
+=head3 set_bitmap_palette
+
+=head3 draw_bitmap
+
+=head3 free_bitmap
+
+=head1 LICENSE
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
+
+ Copyright (C) 2004 Sam Hocevar
+  22 rue de Plaisance, 75014 Paris, France
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 =head1 AUTHOR
 
+John Beppu E<lt>beppu@cpan.orgE<gt>
+
 =head1 SEE ALSO
+
+L<Tie::Array::Pointer|Tie::Array::Pointer>,
+
+L<Term::Caca::Constants|Term::Caca::Constants>,
+L<Term::Caca::Sprite|Term::Caca::Sprite>,
+L<Term::Caca::Bitmap|Term::Caca::Bitmap>,
+
+L<Term::Kaka|Term::Kaka>
 
 =cut
 

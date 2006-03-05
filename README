@@ -20,13 +20,6 @@ ___________                           _________
 
 --]- WARNING
 
-	I normally wouldn't release something that's in an unfinished
-	and undocumented state, but I made a promise that I'd release
-	*SOMETHING* by June 10, 2005, so here it is.  
-	
-	It should mostly work.  The bitmap handling code is yet to be
-	tested, but everything else seemed to function as expected.
-
 	Unfortunately, I haven't gotten around to writing proper POD
 	yet, so those who wish to try these modules out are asked to
 	use the source as a reference.  The libcaca documentation for
@@ -35,7 +28,3 @@ ___________                           _________
 	closely mirrors that of the C library.  The next release will
 	be proplerly documented.
 	
-	For a working code example, look at the little script at the 
-	root of the distribution called, "x.pl".  Although a bit crude,
-	it will show you how this module can be used.
-

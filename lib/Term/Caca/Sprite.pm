@@ -1,6 +1,7 @@
 package Term::Caca::Sprite;
 
 use strict;
+use warnings;
 use Term::Caca;
 
 sub new {
@@ -108,6 +109,12 @@ B<Example>:
 B<Example>:
 
 =head2 get_dy
+
+...
+
+B<Example>:
+
+=head2 draw
 
 ...
 

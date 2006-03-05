@@ -2,9 +2,10 @@ use Module::Build;
 
 my $builder = Module::Build->new (
   module_name    => 'Term::Caca',
-  license        => 'lgpl',
+  license        => 'unrestricted',
 
   requires       => {
+    'Tie::Array::Pointer' => 0
   },
 
   build_requires => {

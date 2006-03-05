@@ -7,5 +7,5 @@
 \b\.xvpics\b
 \b_build\b
 ^Build$
-^.*tar\.gz$
+^.*\.gz$
 ^x.pl$

@@ -1,6 +1,7 @@
 package Term::Caca::Bitmap;
 
 use strict;
+use warnings;
 use Term::Caca;
 
 sub new {
