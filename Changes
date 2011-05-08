@@ -1,4 +1,9 @@
-0.95
+Revision history for Term::Caca
+
+0.96 2011-05-08
+  * add support for API 1.x of libcaca (rt68008)
+
+0.95  2006-03-05
   * first release in a long time
   * added much pod
   * killed memory leaks
