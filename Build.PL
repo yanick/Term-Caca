@@ -4,10 +4,6 @@ my $builder = Module::Build->new (
   module_name    => 'Term::Caca',
   license        => 'unrestricted',
 
-  requires       => {
-    'Tie::Array::Pointer' => 0
-  },
-
   build_requires => {
     'Test::More' => 0,
   },
