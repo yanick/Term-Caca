@@ -9,3 +9,7 @@
 ^Build$
 ^.*\.gz$
 ^x.pl$
+^MYMETA.yml$
+\.gitignore
+\.git
+lib/Term/Caca\.c

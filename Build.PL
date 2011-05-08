@@ -13,7 +13,6 @@ my $builder = Module::Build->new (
 
   extra_compiler_flags => scalar `caca-config --cflags`,
   extra_linker_flags   => scalar `caca-config --libs`,
-  create_makefile_pl   => 'passthrough',
 );
 
 $builder->create_build_script();
