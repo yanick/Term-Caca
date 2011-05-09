@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+use Term::Caca;
+use Term::Caca::Sprite;
+
+# draw a sprite
+sub draw {
+  return 0;
+}
+
+my %action = (
+  d    => \&draw,
+  draw => \&draw,
+);
+
+my $command = shift;
+
+my $rc = $action{$command}->(@ARGV);
+
+exit $rc;
+
+__END__
+
+=head1 NAME
+
+caca-sprite - libcaca sprite manipulation tool
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=cut

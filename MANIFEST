@@ -1,0 +1,21 @@
+bin/caca-sprite
+Build.PL
+Changes
+lib/Term/Caca.pm
+lib/Term/Caca.xs
+lib/Term/Caca/Bitmap.pm
+lib/Term/Caca/Constants.pm
+lib/Term/Caca/Sprite.pm
+lib/Term/Kaka.pm
+lib/Term/Kaka/Bitmap.pm
+lib/Term/Kaka/Constants.pm
+lib/Term/Kaka/Sprite.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00_use.t
+t/01_pod.t
+t/02_pod_coverage.t
+t/data/caca.txt
+t/basic.t
