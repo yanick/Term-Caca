@@ -568,8 +568,6 @@ John Beppu E<lt>beppu@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
-L<Tie::Array::Pointer|Tie::Array::Pointer>,
-
 L<Term::Caca::Constants|Term::Caca::Constants>,
 L<Term::Caca::Sprite|Term::Caca::Sprite>,
 L<Term::Caca::Bitmap|Term::Caca::Bitmap>,
