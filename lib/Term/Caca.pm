@@ -472,19 +472,37 @@ a constant frame rate
 
 =head3 clear
 
-=head3 draw_line
+=head3 draw_line( $x1, $y1, $x2, $y2, $char )
+
+Draws a line from I<($x1,$y2)> to I<($x2,$y2)>
+using the character I<$char>.
+
+=head3 draw_thin_line( $x1, $y1, $x2, $y2 )
+
+Draws a line from I<($x1,$y2)> to I<($x2,$y2)>
+using ascii art.
 
 =head3 draw_polyline
 
-=head3 draw_thin_line
 
 =head3 draw_thin_polyline
 
-=head3 draw_circle
+=head3 draw_circle( $x, $y, $r, $char );
 
-=head3 draw_ellipse
+Draws a circle centered at I<($x,$y)> with a radius
+of I<$r> using the character I<$char>.
 
-=head3 draw_thin_ellipse
+=head3 draw_ellipse( $x, $y, $radius_x, $radius_y, $char )
+
+Draws an ellipse centered at I<($x,$y)> with an x-axis
+radius of I<$radius_x> and a y-radius of I<$radius_y>
+using the character I<$char>.
+
+=head3 draw_thin_ellipse( $x, $y, $radius_x, $radius_y )
+
+Draws an ellipse centered at I<($x,$y)> with an x-axis
+radius of I<$radius_x> and a y-radius of I<$radius_y>
+using ascii art.
 
 =head3 fill_ellipse
 
