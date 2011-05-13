@@ -1,5 +1,7 @@
 Revision history for Term::Caca
 
+  * remove script caca-sprite
+
 0.97 2011-05-12
   * draw_thin_line was erronously _draw_line (rt62969)
   * Build.PL now verify that libcaca is available
