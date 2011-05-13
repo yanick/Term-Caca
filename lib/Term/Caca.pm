@@ -232,7 +232,7 @@ sub draw_ellipse {
 #
 sub draw_thin_ellipse {
   my ($self, $x0, $y0, $ra, $rb) = @_;
-  _draw_ellipse($x0, $y0, $ra, $rb);
+  _draw_thin_ellipse($x0, $y0, $ra, $rb);
 }
 
 #
