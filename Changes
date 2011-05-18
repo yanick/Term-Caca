@@ -1,5 +1,7 @@
 Revision history for Term::Caca
 
+{{$NEXT}}
+  * add maze.pl example
   * remove script caca-sprite
 
 0.97 2011-05-12
