@@ -1,11 +1,10 @@
 package Term::Caca::Constants;
+#ABSTRACT: libcaca constants from caca.h
 
 use strict;
 use warnings;
 use base 'Exporter';
 use vars qw(@EXPORT_OK %EXPORT_TAGS $VERSION);
-
-$VERSION = '0.9';
 
 use constant {
 
@@ -310,9 +309,6 @@ use constant {
 
 __END__
 
-=head1 NAME
-
-Term::Caca::Constants - libcaca constants from caca.h
 
 =head1 SYNOPSIS
 

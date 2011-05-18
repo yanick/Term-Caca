@@ -1,4 +1,5 @@
 package Term::Caca::Bitmap;
+#ABSTRACT: an OO-interface to caca_bitmap
 
 use strict;
 use warnings;
@@ -30,9 +31,6 @@ sub DESTROY {
 __END__
 
 
-=head1 NAME
-
-Term::Caca::Bitmap - an OO-interface to caca_bitmap
 
 =head1 SYNOPSIS
 
