@@ -1,3 +1,6 @@
+dist\.ini
+MANIFEST\.SKIP
+^Term-Caca-\d
 \bCVS\b
 ^MANIFEST\.bak$
 ^Makefile$
@@ -13,3 +16,4 @@
 \.gitignore
 \.git
 lib/Term/Caca\.c
+\.o$
