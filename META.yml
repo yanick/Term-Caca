@@ -16,7 +16,7 @@ name: Term-Caca
 provides:
   Term::Caca:
     file: lib/Term/Caca.pm
-    version: 0.96
+    version: 0.97
   Term::Caca::Bitmap:
     file: lib/Term/Caca/Bitmap.pm
   Term::Caca::Constants:
@@ -32,4 +32,4 @@ provides:
     file: lib/Term/Kaka/Constants.pm
   Term::Kaka::Sprite:
     file: lib/Term/Kaka/Sprite.pm
-version: 0.96
+version: 0.97
