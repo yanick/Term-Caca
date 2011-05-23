@@ -3,7 +3,6 @@ package Term::Caca;
 
 require Exporter;
 require DynaLoader;
-$VERSION = '0.97';
 @ISA = qw(Exporter DynaLoader);
 Term::Caca->bootstrap($VERSION);
 
