@@ -5,6 +5,10 @@
 #include "XSUB.h"
 
 #include "caca.h"
+#ifdef CACA_API_VERSION_1
+#   include <caca0.h>
+#endif
+
 #include <sys/types.h>
 
 /* ref($object) eq 'HASH' && $object->{__address} */
