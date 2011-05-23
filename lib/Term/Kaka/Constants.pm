@@ -1,4 +1,6 @@
 package Term::Kaka::Constants;
+#ABSTRACT: Term::Caca::Constants
+
 use strict;
 use Term::Caca::Constants qw(:all);
 push @ISA, 'Term::Caca::Constants';
@@ -9,9 +11,3 @@ push @ISA, 'Term::Caca::Constants';
 1;
 
 __END__
-
-=head1 NAME
-
-Term::Kaka::Constants - Term::Caca::Constants
-
-=cut

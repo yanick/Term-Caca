@@ -1,13 +1,11 @@
 package Term::Kaka;
+#ABSTRACT: a subclass of Term::Caca with virtually identical behavior
+
 use strict;
 use base 'Term::Caca';
 1;
 
 __END__
-
-=head1 NAME
-
-Term::Kaka - a subclass of Term::Caca with virtually identical behavior
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,5 @@
 package Term::Caca::Sprite;
+#ABSTRACT: an OO-interface to caca_sprite
 
 use strict;
 use warnings;
@@ -51,9 +52,6 @@ sub DESTROY {
 
 __END__
 
-=head1 NAME
-
-Term::Caca::Sprite - an OO-interface to caca_sprite
 
 =head1 SYNOPSIS
 
