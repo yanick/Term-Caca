@@ -136,6 +136,22 @@ _get_feature(feature)
   OUTPUT:
     RETVAL
 
+void *
+_create_display()
+    CODE:
+        RETVAL = caca_create_display(NULL);
+    OUTPUT:
+        RETVAL
+
+void *
+_get_canvas(display)
+    void *display
+    CODE:
+        RETVAL = caca_get_canvas(display);
+    OUTPUT:
+        RETVAL
+        
+
 void
 _set_feature(feature)
     unsigned int feature
@@ -150,7 +166,7 @@ _get_feature_name(feature)
   OUTPUT:
     RETVAL
 
-unsigned int
+int
 _get_rendertime()
   CODE:
     RETVAL = caca_get_rendertime();
@@ -461,7 +477,7 @@ _draw_thin_box(x0, y0, x1, y1)
     int x1;
     int y1;
   CODE:
-    caca_thin_box(x0, y0, x1, y1);
+    caca_draw_thin_box(x0, y0, x1, y1);
 
 void
 _fill_box(x0, y0, x1, y1, c)

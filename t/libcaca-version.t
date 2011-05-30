@@ -2,7 +2,7 @@ use strict;
 
 use Test::More tests => 1;                      # last test to print
 
-my $version =  scalar `caa-config --version`;
+my $version =  scalar `caca-config --version`;
 
 diag "libcaca version: $version" if $version;
 
