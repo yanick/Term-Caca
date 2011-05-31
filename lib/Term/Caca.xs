@@ -120,10 +120,20 @@ _init()
     caca_init();
 
 void
-_set_delay(usec)
-    unsigned int usec
+_set_delay(display,usec)
+    void *display;
+    unsigned int usec;
   CODE:
-    caca_set_delay(usec);
+    caca_set_display_time(display,usec);
+
+int
+_get_delay(display)
+    void *display;
+  CODE:
+    RETVAL = caca_get_display_time(display);
+  OUTPUT:
+    RETVAL
+
 
 
 void *

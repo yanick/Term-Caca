@@ -10,7 +10,8 @@ my $t = Term::Caca->new;
 
 $t = $t->set_title( __FILE__ );
 
-$t = $t->set_delay( 1_000_000 );
+$t = $t->set_refresh_delay( 0.9 );
+diag $t->rendering_time;
 
 $t->set_color( CACA_COLOR_YELLOW, CACA_COLOR_DARKGRAY );
 

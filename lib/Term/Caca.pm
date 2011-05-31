@@ -62,20 +62,34 @@ method set_title ( $title ) {
 }
 
 
-=method set_delay( $usecs )
+=method set_refresh_delay( $seconds )
 
-Sets the amount of time in microseconds between frames to establish
-a constant frame rate.
+Sets the refresh delay in seconds. The refresh delay is used by                                                                
+C<refresh> to achieve constant framerate.
+
+If the time is zero, constant framerate is disabled. This is the
+default behaviour.                                                                                                                 
 
 Returns the invocant I<Term::Caca> object.
 
 =cut
 
-sub set_delay {
-  my ($self, $usec) = @_;
-  $usec ||= 0;
-  _set_delay($usec);
+method set_refresh_delay ( $seconds ) {
+  _set_delay($self->display,int( $seconds * 1_000_000 ));
   return $self;
+}
+
+=method rendering_time()
+
+Returns the average rendering time, which is measured as the time between
+two C<refresh()> calls, in seconds. If constant framerate is enabled via
+C<set_refresh_delay()>, the average rendering time will be close to the 
+requested delay even if the real rendering time was shorter.                                   
+
+=cut
+
+method rendering_time {
+  return _get_delay($self->display)/1_000_000;
 }
 
 
