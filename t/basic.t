@@ -6,13 +6,9 @@ use Test::More;
 use Term::Caca;
 use Term::Caca::Constants qw/ :all /;
 
-Term::Caca::_get_canvas( Term::Caca::_create_display() );
-Term::Caca::_get_canvas( Term::Caca::_create_display() );
-<>;
+my $t = Term::Caca->new;
 
-my $t = Term::Caca->init;
-
-$t = $t->set_window_title( __FILE__ );
+$t = $t->set_title( __FILE__ );
 
 $t = $t->set_delay( 1_000_000 );
 

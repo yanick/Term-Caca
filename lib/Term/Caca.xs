@@ -5,9 +5,6 @@
 #include "XSUB.h"
 
 #include "caca.h"
-#ifdef CACA_API_VERSION_1
-#   include <caca0.h>
-#endif
 
 #include <sys/types.h>
 
@@ -128,13 +125,6 @@ _set_delay(usec)
   CODE:
     caca_set_delay(usec);
 
-unsigned int
-_get_feature(feature)
-    unsigned int feature
-  CODE:
-    RETVAL = caca_get_feature(feature);
-  OUTPUT:
-    RETVAL
 
 void *
 _create_display()
@@ -152,19 +142,6 @@ _get_canvas(display)
         RETVAL
         
 
-void
-_set_feature(feature)
-    unsigned int feature
-  CODE:
-    caca_set_feature(feature);
-
-const char *
-_get_feature_name(feature)
-    unsigned int feature
-  CODE:
-    RETVAL = caca_get_feature_name(feature);
-  OUTPUT:
-    RETVAL
 
 int
 _get_rendertime()
@@ -188,10 +165,11 @@ _get_height()
     RETVAL
 
 int
-_set_window_title(title)
-    const char *title
+_set_display_title(display,title)
+    void *display;
+    const char *title;
   CODE:
-    RETVAL = caca_set_window_title(title);
+    RETVAL = caca_set_display_title(display, title);
   OUTPUT:
     RETVAL
 
@@ -222,24 +200,28 @@ _end()
 # -==[- Event handling -]==---------------------------------------------------
 
 unsigned int
-_get_event(event_mask)
-    unsigned int event_mask
+_get_event(display,event_mask,timeout)
+    void *display;
+    unsigned int event_mask;
+    unsigned int timeout;
   CODE:
-    RETVAL = caca_get_event(event_mask);
+    RETVAL = caca_get_event(display,event_mask,NULL,timeout);
   OUTPUT:
     RETVAL
 
 unsigned int
-_get_mouse_x()
+_get_mouse_x(display)
+    void *display;
   CODE:
-    RETVAL = caca_get_mouse_x();
+    RETVAL = caca_get_mouse_x(display);
   OUTPUT:
     RETVAL
 
 unsigned int
-_get_mouse_y()
+_get_mouse_y(display)
+    void *display;
   CODE:
-    RETVAL = caca_get_mouse_y();
+    RETVAL = caca_get_mouse_y(display);
   OUTPUT:
     RETVAL
 
@@ -309,17 +291,19 @@ _clear()
 # -==[- Primitives drawing -]==-----------------------------------------------
 
 void
-_draw_line(x1, y1, x2, y2, c)
+_draw_line(canvas,x1, y1, x2, y2, c)
+    void * canvas;
     int x1;
     int y1;
     int x2;
     int y2;
     char c;
   CODE:
-    caca_draw_line(x1, y1, x2, y2, c);
+    caca_draw_line(canvas,x1, y1, x2, y2, c);
 
 void
-_draw_polyline(x, y, n, c)
+_draw_polyline(canvas,x, y, n, c)
+    void * canvas;
     SV *x;
     SV *y;
     int n;
@@ -362,21 +346,23 @@ _draw_polyline(x, y, n, c)
       }
     }
   CODE:
-    caca_draw_polyline(xc, yc, n, c);
+    caca_draw_polyline(canvas,xc, yc, n, c);
     free(yc);
     free(xc);
 
 void
-_draw_thin_line(x1, y1, x2, y2)
+_draw_thin_line(canvas,x1, y1, x2, y2)
+    void * canvas;
     int x1;
     int y1;
     int x2;
     int y2;
   CODE:
-    caca_draw_thin_line(x1, y1, x2, y2);
+    caca_draw_thin_line(canvas,x1, y1, x2, y2);
 
 void
-_draw_thin_polyline(x, y, n)
+_draw_thin_polyline(canvas,x, y, n)
+    void * canvas;
     SV  *x;
     SV  *y;
     int n;
@@ -418,79 +404,87 @@ _draw_thin_polyline(x, y, n)
       }
     }
   CODE:
-    caca_draw_thin_polyline(xc, yc, n);
+    caca_draw_thin_polyline(canvas,xc, yc, n);
     free(yc);
     free(xc);
 
 void
-_draw_circle(x, y, r, c)
+_draw_circle(canvas,x, y, r, c)
+    void * canvas;
     int  x;
     int  y;
     int  r;
     char c;
   CODE:
-    caca_draw_circle(x, y, r, c);
+    caca_draw_circle(canvas,x, y, r, c);
 
 void
-_draw_ellipse(x0, y0, a, b, c)
+_draw_ellipse(canvas,x0, y0, a, b, c)
+    void * canvas;
     int  x0;
     int  y0;
     int  a;
     int  b;
     char c;
   CODE:
-    caca_draw_ellipse(x0, y0, a, b, c);
+    caca_draw_ellipse(canvas,x0, y0, a, b, c);
 
 void
-_draw_thin_ellipse(x0, y0, a, b)
+_draw_thin_ellipse(canvas,x0, y0, a, b)
+    void * canvas;
     int x0;
     int y0;
     int a;
     int b;
   CODE:
-    caca_draw_thin_ellipse(x0, y0, a, b);
+    caca_draw_thin_ellipse(canvas,x0, y0, a, b);
 
 void
-_fill_ellipse(x0, y0, a, b, c)
+_fill_ellipse(canvas,x0, y0, a, b, c)
+    void * canvas;
     int  x0;
     int  y0;
     int  a;
     int  b;
     char c;
   CODE:
-    caca_fill_ellipse(x0, y0, a, b, c);
+    caca_fill_ellipse(canvas,x0, y0, a, b, c);
 
 void
-_draw_box(x0, y0, x1, y1, c)
+_draw_box(canvas,x0, y0, x1, y1, c)
+    void * canvas;
     int  x0;
     int  y0;
     int  x1;
     int  y1;
     char c;
   CODE:
-    caca_draw_box(x0, y0, x1, y1, c);
+    caca_draw_box(canvas,x0, y0, x1, y1, c);
 
 void
-_draw_thin_box(x0, y0, x1, y1)
+_draw_thin_box(canvas,x0, y0, x1, y1)
+    void * canvas;
     int x0;
     int y0;
     int x1;
     int y1;
   CODE:
-    caca_draw_thin_box(x0, y0, x1, y1);
+    caca_draw_thin_box(canvas,x0, y0, x1, y1);
 
 void
-_fill_box(x0, y0, x1, y1, c)
+_fill_box(canvas,x0, y0, x1, y1, c)
+    void * canvas;
     int  x0;
     int  y0;
     int  x1;
     int  y1;
     char c;
   CODE:
-    caca_fill_box(x0, y0, x1, y1, c);
+    caca_fill_box(canvas,x0, y0, x1, y1, c);
 
 void
-_draw_triangle(x0, y0, x1, y1, x2, y2, c)
+_draw_triangle(canvas, x0, y0, x1, y1, x2, y2, c)
+    void * canvas;
     int  x0;
     int  y0;
     int  x1;
@@ -499,10 +493,11 @@ _draw_triangle(x0, y0, x1, y1, x2, y2, c)
     int  y2;
     char c;
   CODE:
-    caca_draw_triangle(x0, y0, x1, y1, x2, y2, c);
+    caca_draw_triangle(canvas,x0, y0, x1, y1, x2, y2, c);
 
 void
-_draw_thin_triangle(x0, y0, x1, y1, x2, y2)
+_draw_thin_triangle(canvas,x0, y0, x1, y1, x2, y2)
+    void * canvas;
     int x0;
     int y0;
     int x1;
@@ -510,10 +505,11 @@ _draw_thin_triangle(x0, y0, x1, y1, x2, y2)
     int x2;
     int y2;
   CODE:
-    caca_draw_thin_triangle(x0, y0, x1, y1, x2, y2);
+    caca_draw_thin_triangle(canvas,x0, y0, x1, y1, x2, y2);
 
 void
-_fill_triangle(x0, y0, x1, y1, x2, y2, c)
+_fill_triangle(canvas, x0, y0, x1, y1, x2, y2, c)
+    void * canvas;
     int  x0;
     int  y0;
     int  x1;
@@ -522,7 +518,7 @@ _fill_triangle(x0, y0, x1, y1, x2, y2, c)
     int  y2;
     char c;
   CODE:
-    caca_fill_triangle(x0, y0, x1, y1, x2, y2, c);
+    caca_fill_triangle(canvas, x0, y0, x1, y1, x2, y2, c);
 
 # -==[- Mathematical functions -]==-------------------------------------------
 
@@ -671,44 +667,6 @@ _free_sprite(sprite)
     caca_free_sprite(c_sprite);
 
 # -==[- Bitmap handling -]==--------------------------------------------------
-
-SV *
-_create_bitmap(bpp, w, h, pitch, rmask, gmask, bmask, amask)
-    unsigned int bpp;
-    unsigned int w;
-    unsigned int h;
-    unsigned int pitch;
-    unsigned int rmask;
-    unsigned int gmask;
-    unsigned int bmask;
-    unsigned int amask;
-  INIT:
-    struct caca_bitmap *c_bitmap;
-    HV                 *bitmap;
-  CODE:
-    c_bitmap = caca_create_bitmap(
-      bpp, w, h, pitch, rmask, gmask, bmask, amask
-    );
-    if (!c_bitmap) {
-      XSRETURN_UNDEF;
-    } else {
-      bitmap = (HV *) sv_2mortal((SV *) newHV());
-      if (!bitmap) {
-        XSRETURN_UNDEF;
-      }
-      hv_store(bitmap, "__address",  9, newSViv((size_t) c_bitmap), 0);
-      hv_store(bitmap, "__bpp",      5, newSViv((int)    bpp     ), 0);
-      hv_store(bitmap, "__w",        3, newSViv((int)    w       ), 0);
-      hv_store(bitmap, "__h",        3, newSViv((int)    h       ), 0);
-      hv_store(bitmap, "__pitch",    7, newSViv((int)    pitch   ), 0);
-      hv_store(bitmap, "__rmask",    7, newSViv((int)    rmask   ), 0);
-      hv_store(bitmap, "__gmask",    7, newSViv((int)    gmask   ), 0);
-      hv_store(bitmap, "__bmask",    7, newSViv((int)    bmask   ), 0);
-      hv_store(bitmap, "__amask",    7, newSViv((int)    amask   ), 0);
-      RETVAL = newRV((SV *) bitmap);
-    }
-  OUTPUT:
-    RETVAL
 
 void
 _set_bitmap_palette_tied(bitmap, red, green, blue, alpha)

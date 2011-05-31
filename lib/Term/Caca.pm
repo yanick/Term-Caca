@@ -21,8 +21,6 @@ use Method::Signatures;
 # Basic functions
 
 
-=method init
-
 =method new
 
 This method instantiates a Term::Caca object.  (Note that init() is an alias for new()
@@ -31,12 +29,38 @@ and that they may be used interchangeably.)
 =cut
 
 sub new {
-  my ($class) = @_;
-  _init();
-  my $self = { };
-  return bless($self => $class);
+  my $class = shift;
+  my $self = {};
+  bless $self, $class;
+
+  $self->{display} = _create_display();
+  $self->{canvas}  = _get_canvas($self->{display});
+
+  return $self;
 }
-*init = \*new;
+
+method display {
+    return $self->{display};
+}
+
+method canvas {
+    return $self->{canvas};
+}
+
+=method set_title( $title )
+
+Sets the window title to I<$title>. 
+
+Returns the invocant I<Term::Caca> object.
+
+=cut
+
+method set_title ( $title ) {
+  _set_display_title($self->display, $title);
+
+  return $self;
+}
+
 
 =method set_delay( $usecs )
 
