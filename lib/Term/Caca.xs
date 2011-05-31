@@ -161,16 +161,18 @@ _get_rendertime()
     RETVAL
 
 unsigned int
-_get_width()
+_get_width(canvas)
+    void *canvas;
   CODE:
-    RETVAL = caca_get_width();
+    RETVAL = caca_get_canvas_width(canvas);
   OUTPUT:
     RETVAL
 
 unsigned int
-_get_height()
+_get_height(canvas)
+    void *canvas;
   CODE:
-    RETVAL = caca_get_height();
+    RETVAL = caca_get_canvas_height(canvas);
   OUTPUT:
     RETVAL
 
@@ -198,9 +200,10 @@ _get_window_height()
     RETVAL
 
 void
-_refresh()
+_refresh(display)
+    void *display;
   CODE:
-    caca_refresh();
+    caca_refresh_display(display);
 
 void
 _end()
@@ -246,11 +249,12 @@ _wait_event(event_mask)
 # -==[- Character printing -]==-----------------------------------------------
 
 void
-_set_color(fgcolor, bgcolor)
+_set_color(canvas, fgcolor, bgcolor)
+    void *canvas;
     unsigned int fgcolor;
     unsigned int bgcolor;
   CODE:
-    caca_set_color(fgcolor, bgcolor);
+    caca_set_color_argb(canvas,fgcolor, bgcolor);
 
 unsigned int
 _get_fg_color()
@@ -275,28 +279,31 @@ _get_color_name(color)
     RETVAL
 
 void
-_putchar(x, y, c)
+_putchar(canvas,x, y, c)
+    void *canvas;
     int  x;
     int  y;
     char c;
   CODE:
-    caca_putchar(x, y, c);
+    caca_put_char(canvas,x, y, c);
 
 void
-_putstr(x, y, s)
+_putstr(canvas, x, y, s)
+    void* canvas;
     int        x;
     int        y;
     const char *s;
   CODE:
-    caca_putstr(x, y, s);
+    caca_put_str(canvas, x, y, s);
 
 # skip caca_printf for now.
 # handle va_args on perl side.
 
 void
-_clear()
+_clear(canvas)
+    void *canvas;
   CODE:
-    caca_clear();
+    caca_clear_canvas(canvas);
 
 # -==[- Primitives drawing -]==-----------------------------------------------
 

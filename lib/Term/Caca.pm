@@ -1,6 +1,8 @@
 package Term::Caca;
 #ABSTRACT: perl interface for libcaca (Colour AsCii Art library)
 
+use 5.10.0;
+
 our $VERSION = 0.98;
 
 require Exporter;
@@ -92,6 +94,35 @@ method rendering_time {
   return _get_delay($self->display)/1_000_000;
 }
 
+=method set_color( $foreground, $background ) 
+
+Sets the foreground and background colors used by primitives. 
+
+Each color is an array ref to a ARGB (transparency + RGB) set of values,
+all between 0 and 15. Alternatively, they can be given as a string of the direct
+hexadecimal value.
+
+    # red on white
+    $t->set_color( [ 15, 15, 0, 0 ], 'ffff' );
+
+Returns the invocant object.
+
+=cut
+
+method set_color( $foreground, $background ) {
+    _set_color( $self->canvas, map { _arg_to_color( $_ ) } $foreground, $background );
+
+    return $self;
+}
+
+sub _arg_to_color {
+    my $arg = shift;
+
+    return hex $arg unless ref $arg;
+
+    return hex sprintf "%x%x%x%x", @$arg;
+}
+
 
 sub get_feature {
   my ($self, $feature) = @_;
@@ -130,24 +161,24 @@ sub get_rendertime {
   return _get_rendertime();
 }
 
-=method get_width
+=method canvas_width
 
 Returns the canvas width.
 
 =cut
 
-sub get_width {
-  return _get_width();
+method canvas_width {
+  return _get_width($self->canvas);
 }
 
-=head3 get_height
+=head3 canvas_height
 
 Returns the canvas height.
 
 =cut
 
-sub get_height {
-  return _get_height();
+method canvas_height {
+  return _get_height($self->canvas);
 }
 
 =head3 set_window_title( $title )
@@ -188,9 +219,9 @@ Returns the invocant I<Term::Caca> object.
 
 =cut
 
-sub refresh {
-  _refresh();
-  return shift;
+method refresh {
+  _refresh($self->display);
+  return $self;
 }
 
 sub DESTROY {
@@ -211,14 +242,17 @@ sub get_event {
 =method mouse_position 
 
 Returns the position of the mouse. In a list context, returns
-the I<x>, I<y> coordinates, in a scalar context returns an
-array ref to them.
+the I<x>, I<y> coordinates, in a scalar context returns them as an
+array ref.
 
+This function is not reliable if the ncurses or S-Lang                                                            
+drivers are being used, because mouse position is only detected when                                                               
+the mouse is clicked. Other drivers such as X11 work well.
 
 =cut
 
 method mouse_position {
-    my @pos = ( _get_mouse_x(), _get_mouse_y() );
+    my @pos = ( _get_mouse_x( $self->display ), _get_mouse_y( $self->display ) );
     return wantarray ? @pos : \@pos;
 }
 
@@ -246,19 +280,6 @@ sub wait_event {
 # Character printing
 
 #
-
-=method set_color( $foreground, $background )
-
-Sets the foreground and background colors.
-
-=cut
-
-sub set_color {
-  my ($self, $fgcolor, $bgcolor) = @_;
-  $fgcolor ||= CACA_COLOR_LIGHTGRAY;
-  $bgcolor ||= CACA_COLOR_BLACK;
-  return _set_color($fgcolor, $bgcolor);
-}
 
 #
 sub get_fg_color {
@@ -289,8 +310,8 @@ Returns the invocant C<Term::Caca> object.
 
 method text ( $coord, $text ) {
     length $text > 1 
-        ? _putstr( @$coord, $text )
-        : _putchar( @$coord, $text );        
+        ? _putstr( $self->canvas, @$coord, $text )
+        : _putchar( $self->canvas, @$coord, $text );        
 
     return $self;
 }
@@ -306,7 +327,7 @@ Returns the invocant C<Term::Caca> object.
 =cut
 
 method char ( $coord, $char ) {
-    _putchar( @$coord, substr $char, 0, 1 );
+    _putchar( $self->canvas, @$coord, substr $char, 0, 1 );
 
     return $self;
 }
@@ -351,26 +372,40 @@ sub printf {
   _putstr($x, $y, $string);
 }
 
-#
-sub clear {
-  _clear();
+=method clear()
+
+Clears the canvas using the current background color.
+
+Returns the invocant object.
+
+=cut
+
+method clear () {
+  _clear($self->canvas);
+  return $self;
 }
 
 # Primitives drawing
 
-=method draw_line( $x1, $y1, $x2, $y2, $char )
+=method line( \@point_a, \@point_b, :$char = undef )
 
-Draws a line from I<($x1,$y2)> to I<($x2,$y2)>
-using the character I<$char>.
+Draws a line from I<@point_a> to I<@point_b>
+using the character I<$char> or, if undefined,
+ascii art.
+
+Returns the invocant object.
 
 =cut
 
-sub draw_line {
-  my ($self, $x1, $y1, $x2, $y2, $c) = @_;
-  _draw_line($x1, $y1, $x2, $y2, $c);
+method line ( $pa, $pb, :$char = undef ) {
+    defined ( $char ) 
+    ?  _draw_line($self->canvas, @$pa, @$pb, $char)
+    : _draw_thin_line($self->canvas,  @$pa, @$pb );
+
+    return $self;
 }
 
-=method polyline( \@points, $char = undef , $closed = 0 ) 
+=method polyline( \@points, :$char = undef , :$close = 0 ) 
 
 Draws the polyline defined by I<@points>, where each point is an array ref
 of the coordinates. E.g.
@@ -379,225 +414,151 @@ of the coordinates. E.g.
 
 The lines are drawn using I<$char> or, if not specified, using ascii art.
 
-If I<$closed> is true, the end point of the polyline will 
+If I<$close> is true, the end point of the polyline will 
 be connected to the first point.
 
 Returns the invocant I<Term::Caca> object.
 
 =cut
 
-method polyline( $points, $char = undef, $closed = 0 ) {
+method polyline( $points, :$char = undef, :$close = 0 ) {
     my @x = map { $_->[0] } @$points;
     my @y = map { $_->[1] } @$points;
-    my $n = @x - !$closed;
+    my $n = @x - !$close;
 
-    $char ? _draw_polyline( \@x, \@y, $n, $char )
-          : _draw_thin_polyline( \@x, \@y, $n );
+    $char ? _draw_polyline( $self->canvas, \@x, \@y, $n, $char )
+          : _draw_thin_polyline( $self->canvas, \@x, \@y, $n );
 
     return $self;
 }
 
-=method draw_polyline( \@x_coords, \@y_coords, $nbr_lines, $char )
+=method circle( \@center, $radius, :$char = '*' )
 
-B<DEPRECATED> use C<polyline()> instead.
+Draws a circle centered at I<@center> with a radius
+of I<$radius> using the character I<$char> or, if not defined,
+ascii art. if I<$fill> is set to true, the circle is filled with I<$char>
+as well.
 
-=cut
+If I<$fill> is defined but I<$char> is not, I<$fill> will be taken as
+the filling character. I.e.,
 
-sub draw_polyline {
-  my ($self, $x, $y, $n, $c) = @_;
-  deprecated();
-  _draw_polyline($x, $y, $n, $c);
-}
+    $c->circle( [10,10], 5, char => 'x', fill => 1 );
+    # equivalent to 
+    $c->circle( [10,10], 5, fill => 'x' );
 
-=method draw_thin_line( $x1, $y1, $x2, $y2 )
-
-Draws a line from I<($x1,$y2)> to I<($x2,$y2)>
-using ascii art.
-
-=cut
-
-sub draw_thin_line {
-  my ($self, $x1, $y1, $x2, $y2) = @_;
-  _draw_thin_line($x1, $y1, $x2, $y2);
-}
-
-=method draw_thin_polyline( \@x_coords, \@y_coords, $nbr_lines )
-
-B<DEPRECATED> use C<polyline()> instead.
+Returns the invocant object.
 
 =cut
 
-sub draw_thin_polyline {
-  my ($self, $x, $y, $n) = @_;
-  _draw_thin_polyline($x, $y, $n);
+method circle ( $center, $radius, :$char = undef, :$fill = undef ) {
+    $char //= $fill;
+
+    my @args = ( $self->canvas, @$center, $radius );
+
+    if ( not defined $char ) {
+        _draw_thin_ellipse( @args, $radius );
+    }
+    else {
+        if ( defined $fill ) {
+            _fill_ellipse( @args, $radius, $char );
+        }
+        else {
+            _draw_circle( @args, $char );
+        }
+    }
+
+  return $self;
 }
 
-=method draw_circle( $x, $y, $r, $char );
+=method draw_ellipse( \@center, $radius_x, $radius_y, :$char = undef, :$fill = undef)
 
-Draws a circle centered at I<($x,$y)> with a radius
-of I<$r> using the character I<$char>.
-
-=cut
-
-sub draw_circle {
-  my ($self, $x, $y, $r, $c) = @_;
-  # TODO : check for sane values
-  _draw_circle($x, $y, $r, $c);
-}
-
-=method draw_ellipse( $x, $y, $radius_x, $radius_y, $char )
-
-Draws an ellipse centered at I<($x,$y)> with an x-axis
+Draws an ellipse centered at I<@center> with an x-axis
 radius of I<$radius_x> and a y-radius of I<$radius_y>
-using the character I<$char>.
+using the character I<$char> or, if not defined, ascii art.
+
+If I<$fill> is defined but I<$char> is not, I<$fill> will be taken as
+the filling character.
+
+Returns the invocant object.
 
 =cut
 
-sub draw_ellipse {
-  my ($self, $x0, $y0, $ra, $rb, $c) = @_;
-  _draw_ellipse($x0, $y0, $ra, $rb, $c);
-}
+method ellipse ( $center, $rx, $ry, :$char = undef, :$fill = undef ) {
+    $char //= $fill;
 
+    if ( defined $fill ) {
+        _fill_ellipse($self->canvas,@$center,$rx,$ry,$char);
+    }
+    elsif( defined $char ) {
+        _draw_ellipse($self->canvas,@$center,$rx,$ry,$char);
+    }
+    else {
+        _draw_thin_ellipse($self->canvas,@$center,$rx,$ry);
+    }
 
-=method draw_thin_ellipse( $x, $y, $radius_x, $radius_y )
-
-Draws an ellipse centered at I<($x,$y)> with an x-axis
-radius of I<$radius_x> and a y-radius of I<$radius_y>
-using ascii art.
-
-=cut
-
-sub draw_thin_ellipse {
-  my ($self, $x0, $y0, $ra, $rb) = @_;
-  _draw_thin_ellipse($x0, $y0, $ra, $rb);
-}
-
-=method fill_ellipse( $x, $y, $radius_x, $radius_y , $char )
-
-Draws an ellipse centered at I<($x,$y)> with an x-axis
-radius of I<$radius_x> and a y-radius of I<$radius_y>, 
-filled using the character I<$char>.
-
-
-=cut
-
-sub fill_ellipse {
-  my ($self, $x0, $y0, $ra, $rb, $c) = @_;
-  _fill_ellipse($x0, $y0, $ra, $rb, $c);
-}
-
-=method draw_box( $x1, $y1, $width, $height, $char )
-
-Draws a rectangle of dimensions I<$width> and
-I<$height> with its upper-left corner at ($x1,$y1),
-using the character I<$char>.
-
-=cut
-
-sub draw_box {
-  my ($self, $x0, $y0, $x1, $y1, $c) = @_;
-  _draw_box($x0, $y0, $x1, $y1, $c);
-}
-
-=method draw_thin_box( $x1, $y1, $width, $height, $char )
-
-Draws a rectangle of dimensions I<$width> and
-I<$height> with its upper-left corner at ($x1,$y1),
-using ascii art.
-
-=cut
-
-sub draw_thin_box {
-  my ($self, $x0, $y0, $x1, $y1) = @_;
-  _draw_thin_box($x0, $y0, $x1, $y1);
-}
-
-=method fill_box( $x1, $y1, $width, $height )
-
-Draws a rectangle of dimensions I<$width> and
-I<$height> with its upper-left corner at ($x1,$y1),
-filling it with the character I<$char>.
-
-=cut
-
-sub fill_box {
-  my ($self, $x0, $y0, $x1, $y1, $c) = @_;
-  _fill_box($x0, $y0, $x1, $y1, $c);
-}
-
-=method draw_triangle( $x1, $y1, $x2, $y2, $x3, $y3, $char )
-
-Draws a triangle defined by the three points ($x1,$y1), ($x2,$y2) 
-and  ($x3,$y3), using the character $char.
-
-Returns the invocant I<Term::Caca> object.
-
-=cut
-
-sub draw_triangle {
-  my ($self, $x0, $y0, $x1, $y1, $x2, $y2, $c) = @_;
-  _draw_triangle($x0, $y0, $x1, $y1, $x2, $y2, $c);
   return $self;
 }
 
-=method draw_thin_triangle( $x1, $y1, $x2, $y2, $x3, $y3 )
 
-Draws a triangle defined by the three points ($x1,$y1), ($x2,$y2) 
-and  ($x3,$y3), using ascii art.
+=method box( \@top_corner, $width, $height, :$char => undef, :$fill => undef )
 
-Returns the invocant I<Term::Caca> object.
+Draws a rectangle of dimensions I<$width> and
+I<$height> with its upper-left corner at I<@top_corner>,
+using the character I<$char> or, if not defined, ascii art. 
+
+If I<$fill> is defined but I<$char> is not, I<$fill> will be taken as
+the filling character.
+
+Returns the invocant object.
 
 =cut
 
-sub draw_thin_triangle {
-  my ($self, $x0, $y0, $x1, $y1, $x2, $y2) = @_;
-  _draw_thin_triangle($x0, $y0, $x1, $y1, $x2, $y2);
+method box  ( $center, $width, $height, :$char = undef, :$fill = undef ){
+  $char //= $fill;
+
+  my @args = ( $self->canvas, @$center, $width, $height );
+
+  if ( defined $fill ) {
+    _fill_box(@args, $char);
+  }
+  elsif( defined $char ) {
+    _draw_box(@args, $char);
+  }
+  else {
+    _draw_thin_box(@args);
+  }
+
   return $self;
 }
 
-=method fill_triangle( $x1, $y1, $x2, $y2, $x3, $y3, $char )
+=method triangle( \@point_a, \@point_b, \@point_c, :$char => undef, :$fill => undef )
 
-Draws a triangle defined by the three points ($x1,$y1), ($x2,$y2) 
-and  ($x3,$y3), filling it with the character $char.
+Draws a triangle defined by the three given points
+using the character I<$char> or, if not defined, ascii art. 
 
-Returns the invocant I<Term::Caca> object.
+If I<$fill> is defined but I<$char> is not, I<$fill> will be taken as
+the filling character.
+
+Returns the invocant object.
 
 =cut
 
-sub fill_triangle {
-  my ($self, $x0, $y0, $x1, $y1, $x2, $y2, $c) = @_;
-  _fill_triangle($x0, $y0, $x1, $y1, $x2, $y2, $c);
+method triangle  ( $pa, $pb, $pc, :$char = undef, :$fill = undef ){
+  $char //= $fill;
+
+  my @args = ( $self->canvas, @$pa, @$pb, @$pc );
+
+  if ( defined $fill ) {
+    _fill_triangle(@args, $char);
+  }
+  elsif( defined $char ) {
+    _draw_triangle(@args, $char);
+  }
+  else {
+    _draw_thin_triangle(@args);
+  }
+
   return $self;
-}
-
-# Mathematical functions
-
-=method rand( $min, $max );
-
-Returns an integer between I<$min> and I<$max>, inclusive.
-
-B<DEPRECATED> Use Perl's I<rand()> instead.
-
-=cut
-
-sub rand {
-    deprecated();
-  my ($self, $min, $max) = @_;
-  return _rand($min, $max);
-}
-
-=method sqrt( $x )
-
-Returns the square root of I<$x>.
-
-B<DEPRECATED> Use Perl's I<sqrt()> instead.
-
-=cut
-
-sub sqrt {
-    deprecated();
-  my ($self, $n) = @_;
-  return _sqrt($n);
 }
 
 # Sprite handling
