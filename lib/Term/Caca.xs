@@ -210,17 +210,49 @@ _end()
   CODE:
     caca_end();
 
+void
+_free_display(display)
+        void *display;
+    CODE:
+        caca_free_display(display);
+
 # -==[- Event handling -]==---------------------------------------------------
 
-unsigned int
-_get_event(display,event_mask,timeout)
+void *
+_get_event(display,event_mask,timeout, want_event )
     void *display;
-    unsigned int event_mask;
-    unsigned int timeout;
+    int event_mask;
+    int timeout;
+    int want_event;
   CODE:
-    RETVAL = caca_get_event(display,event_mask,NULL,timeout);
+    caca_event_t * ev;
+    ev = want_event ? malloc( sizeof( caca_event_t ) ) : NULL;
+    caca_get_event(display, event_mask,ev,timeout);
+    RETVAL = ev;
   OUTPUT:
     RETVAL
+
+int
+_get_event_type(event)
+        void *event;
+    CODE:
+        RETVAL = caca_get_event_type(event);
+    OUTPUT:
+        RETVAL
+
+char
+_get_event_key_ch(event)
+        void *event;
+    CODE:
+        RETVAL = caca_get_event_key_ch(event);
+    OUTPUT:
+        RETVAL
+
+void
+_free_event(event)
+        void *event;
+    CODE:
+        free(event);
 
 unsigned int
 _get_mouse_x(display)
@@ -246,6 +278,47 @@ _wait_event(event_mask)
   OUTPUT:
     RETVAL
 
+
+unsigned int
+_get_event_mouse_x(event)
+    void *event;
+  CODE:
+    RETVAL = caca_get_event_mouse_x(event);
+  OUTPUT:
+    RETVAL
+
+unsigned int
+_get_event_mouse_y(event)
+    void *event;
+  CODE:
+    RETVAL = caca_get_event_mouse_y(event);
+  OUTPUT:
+    RETVAL
+
+int
+_get_event_mouse_button(event)
+    void *event;
+  CODE:
+    RETVAL = caca_get_event_mouse_button(event);
+  OUTPUT:
+    RETVAL
+
+int
+_get_event_resize_width(event)
+    void *event;
+  CODE:
+    RETVAL = caca_get_event_resize_width(event);
+  OUTPUT:
+    RETVAL
+
+int
+_get_event_resize_height(event)
+    void *event;
+  CODE:
+    RETVAL = caca_get_event_resize_height(event);
+  OUTPUT:
+    RETVAL
+
 # -==[- Character printing -]==-----------------------------------------------
 
 void
@@ -255,6 +328,14 @@ _set_color(canvas, fgcolor, bgcolor)
     unsigned int bgcolor;
   CODE:
     caca_set_color_argb(canvas,fgcolor, bgcolor);
+
+void
+_set_ansi_color(canvas, fgcolor, bgcolor)
+    void *canvas;
+    unsigned int fgcolor;
+    unsigned int bgcolor;
+  CODE:
+    caca_set_color_ansi(canvas,fgcolor, bgcolor);
 
 unsigned int
 _get_fg_color()

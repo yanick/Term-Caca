@@ -2,26 +2,102 @@ package Term::Caca;
 #ABSTRACT: perl interface for libcaca (Colour AsCii Art library)
 
 use 5.10.0;
+use strict;
+use warnings;
+no warnings qw/ uninitialized /;
 
 our $VERSION = 0.98;
 
-require Exporter;
-require DynaLoader;
-@ISA = qw(Exporter DynaLoader);
+use parent qw/ Exporter DynaLoader /;
+
 Term::Caca->bootstrap($VERSION);
 
-use strict;
-use warnings;
-use Term::Caca::Constants ':all';
-
-use Package::DeprecationManager -deprecations => {
-    'Term::Caca::rand' => '0.98',
-    'Term::Caca::sqrt' => '0.98',
-};
 use Method::Signatures;
+use Const::Fast;
+use List::MoreUtils qw/ uniq /;
 
-# Basic functions
+use Term::Caca::Event::Key::Press;
+use Term::Caca::Event::Key::Release;
+use Term::Caca::Event::Mouse::Motion;
+use Term::Caca::Event::Mouse::Button::Press;
+use Term::Caca::Event::Mouse::Button::Release;
+use Term::Caca::Event::Resize;
+use Term::Caca::Event::Quit;
 
+# exports
+
+our @EXPORT_OK;
+our %EXPORT_TAGS;
+
+const our %COLORS => (
+  BLACK              => 0,
+  BLUE               => 1,
+  GREEN              => 2,
+  CYAN               => 3,
+  RED                => 4,
+  MAGENTA            => 5,
+  BROWN              => 6,
+  LIGHTGRAY          => 7,
+  DARKGRAY           => 8,
+  LIGHTBLUE          => 9,
+  LIGHTGREEN         => 10,
+  LIGHTCYAN          => 11,
+  LIGHTRED           => 12,
+  LIGHTMAGENTA       => 13,
+  YELLOW             => 14,
+  WHITE              => 15,
+  DEFAULT            => 16,
+  TRANSPARENT        => 32,
+);
+
+const our $BLACK              => 0;
+const our $BLUE               => 1;
+const our $GREEN              => 2;
+const our $CYAN               => 3;
+const our $RED                => 4;
+const our $MAGENTA            => 5;
+const our $BROWN              => 6;
+const our $LIGHTGRAY          => 7;
+const our $DARKGRAY           => 8;
+const our $LIGHTBLUE          => 9;
+const our $LIGHTGREEN         => 10;
+const our $LIGHTCYAN          => 11;
+const our $LIGHTRED           => 12;
+const our $LIGHTMAGENTA       => 13;
+const our $YELLOW             => 14;
+const our $WHITE              => 15;
+const our $DEFAULT            => 16;
+const our $TRANSPARENT        => 32;
+
+$EXPORT_TAGS{colors} = [ map { '$'.$_ } keys %COLORS ];
+push @EXPORT_OK, '@COLORS', @{$EXPORT_TAGS{colors}};
+
+const our %EVENTS => (
+    NO_EVENT =>          0x0000,
+    KEY_PRESS =>     0x0001,
+    KEY_RELEASE =>   0x0002,
+    MOUSE_PRESS =>   0x0004,
+    MOUSE_RELEASE => 0x0008,
+    MOUSE_MOTION =>  0x0010,
+    RESIZE =>        0x0020,
+    QUIT =>          0x0040,
+    ANY_EVENT =>           0xffff,
+);
+
+const our $NO_EVENT =>          0x0000;
+const our $KEY_PRESS =>     0x0001;
+const our $KEY_RELEASE =>   0x0002;
+const our $MOUSE_PRESS =>   0x0004;
+const our $MOUSE_RELEASE => 0x0008;
+const our $MOUSE_MOTION =>  0x0010;
+const our $RESIZE =>        0x0020;
+const our $QUIT =>          0x0040;
+const our $ANY_EVENT =>           0xffff;
+
+$EXPORT_TAGS{events} = [ map { '$'.$_ } keys %EVENTS ];
+push @EXPORT_OK, '@EVENTS', @{$EXPORT_TAGS{events}};
+
+push @{$EXPORT_TAGS{all}}, uniq map { @$_ } values %EXPORT_TAGS;
 
 =method new
 
@@ -94,6 +170,24 @@ method rendering_time {
   return _get_delay($self->display)/1_000_000;
 }
 
+=method set_ansi_color( $foreground, $background )
+
+Sets the foreground and background colors used by primitives,
+using colors as defined by C<%COLORS>.
+
+    $t->set_ansi_color( $LIGHTRED, $WHITE );
+
+Returns the invocant object.
+
+=cut
+
+
+method set_ansi_color( $foreground, $background ) {
+    _set_ansi_color( $self->canvas, $foreground, $background );
+
+    return $self;
+}
+
 =method set_color( $foreground, $background ) 
 
 Sets the foreground and background colors used by primitives. 
@@ -110,6 +204,12 @@ Returns the invocant object.
 =cut
 
 method set_color( $foreground, $background ) {
+    if ( exists $COLORS{uc $foreground} ) {
+        return $self->set_ansi_color( 
+            map { $COLORS{uc $_} } $foreground, $background 
+        );
+    }
+
     _set_color( $self->canvas, map { _arg_to_color( $_ ) } $foreground, $background );
 
     return $self;
@@ -159,6 +259,20 @@ rendering time was shorter.
 
 sub get_rendertime {
   return _get_rendertime();
+}
+
+=method canvas_size
+
+Returns the width and height of the canvas,
+as a list in an array context, as a array ref
+in a scalar context.
+
+=cut
+
+method canvas_size {
+    my @d = ( $self->canvas_width, $self->canvas_height );
+
+    return wantarray ? @d : \@d;
 }
 
 =method canvas_width
@@ -225,18 +339,44 @@ method refresh {
 }
 
 sub DESTROY {
-  _end();
+    my $self = shift;
+  _free_display( $self->{display} ) if $self->{display};
 }
 
 # Event handling
 
 #
-sub get_event {
-  my ($self, $event_mask) = @_;
-  if (!defined($event_mask)) {
-    $event_mask = 0xFFFFFFFF;
+method wait_for_event ( :$mask = $ANY_EVENT, :$timeout = 0 ) {
+  my $event = _get_event( $self->display, $mask, $timeout, defined wantarray )
+      or return;
+
+  given ( _get_event_type( $event ) ) {
+    when ( $KEY_PRESS ) {
+        return Term::Caca::Event::Key::Press->new( event => $event );
+    }
+    when ( $KEY_RELEASE ) {
+        return Term::Caca::Event::Key::Release->new( event => $event );
+    }
+    when ( $MOUSE_MOTION ) {
+        return Term::Caca::Event::Mouse::Motion->new( event => $event );
+    }
+    when ( $MOUSE_PRESS ) {
+        return Term::Caca::Event::Mouse::Button::Press->new( event => $event );
+    }
+    when ( $MOUSE_RELEASE ) {
+        return Term::Caca::Event::Mouse::Button::Release->new( event => $event );
+    }
+    when ( $RESIZE ) {
+        return Term::Caca::Event::Resize->new( event => $event );
+    }
+    when ( $QUIT ) {
+        return Term::Caca::Event::Quit->new( event => $event );
+    }
+    default {
+        return;
+    }
   }
-  return _get_event($event_mask);
+
 }
 
 =method mouse_position 
@@ -250,6 +390,7 @@ drivers are being used, because mouse position is only detected when
 the mouse is clicked. Other drivers such as X11 work well.
 
 =cut
+
 
 method mouse_position {
     my @pos = ( _get_mouse_x( $self->display ), _get_mouse_y( $self->display ) );
@@ -266,13 +407,6 @@ sub get_mouse_x {
 sub get_mouse_y {
 # my ($self) = @_;
   return _get_mouse_y();
-}
-
-#
-sub wait_event {
-  my ($self, $event_mask) = @_;
-  $event_mask ||= CACA_EVENT_ANY;
-  return _wait_event($event_mask);
 }
 
 1;
@@ -665,7 +799,6 @@ sub free_bitmap {
   my ($self, $bitmap) = @_;
   _free_bitmap($bitmap);
 }
-
 'end of Term::Caca';
 
 __END__

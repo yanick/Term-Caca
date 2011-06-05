@@ -3,15 +3,13 @@
 use 5.12.0;
 
 use Games::Maze;
-use Term::Caca;
-use Term::Caca::Constants qw/ :all /;
+use Term::Caca qw/ :colors :events /;
 
 my $term = Term::Caca->new;
 
-$term->set_window_title( 'maze' );
+$term->set_title( 'maze' );
 
-my $w = $term->get_width;
-my $h = $term->get_height;
+my( $w, $h ) = $term->canvas_size;
 
 # generate the maze
 my $maze = Games::Maze->new( 
@@ -22,26 +20,33 @@ $maze->make;
 my @maze = map { [ split '' ] }  split "\n", $maze->to_ascii;
 
 # display the maze itself
-$term->set_color( CACA_COLOR_LIGHTBLUE, CACA_COLOR_BLACK );
+$term->set_color( qw/ LIGHTBLUE BLACK / );
 for my $x ( 0..$w ) {
     for my $y ( 0..$h ) {
-        $term->putchar( $x, $y, $maze[$y][$x] );
+        $term->char( [$x, $y], $maze[$y][$x] );
     }
 }
 
 
-$term->set_color( CACA_COLOR_RED, CACA_COLOR_BLACK );
+$term->set_color( qw/ RED BLACK / );
 
 my @pos = (1,0);
 
 while (1) {
-    $term->putchar( @pos, '@' );
+    $term->char( \@pos, '@' );
     $term->refresh;
-    $term->putchar( @pos, '.' );
+    $term->char( \@pos, '.' );
+
+    my $event = $term->wait_for_event( 
+        timeout => -1,
+        mask => $KEY_PRESS | $QUIT 
+    );  
+
+    exit if $event->isa( 'Term::Caca::Event::Quit' )
+         or $event->char eq 'q';
 
     # move using the keypad (2, 4, 6, 8)
-    given ( chr( $term->wait_event( CACA_EVENT_KEY_PRESS ) 
-                    ^ CACA_EVENT_KEY_PRESS ) ) {
+    given ( $event->char ) {
         when ( 2 ) { 
             if ( $pos[1] < $w and $maze[$pos[1]+1][$pos[0]] eq ' ' ) {
                 $pos[1]++;
@@ -63,5 +68,4 @@ while (1) {
             }
         }
     }
-    $term->putchar( @pos, '@' );
 }
