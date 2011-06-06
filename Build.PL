@@ -1,36 +1,46 @@
-use Module::Build;
 
-my $version = scalar `caca-config --version` or do {
+use strict;
+use warnings;
 
-   warn <<'END';
+use Module::Build 0.3601;
+use lib 'inc'; use MyBuild;
 
-caca-config not found, is libcaca installed?
-
-If your distribution doesn't provide a package, 
-libcaca can be found at http://caca.zoy.org/wiki/libcaca
-
-END
-
-    exit 0;
-};
-
-chomp $version;
-
-print "libcaca version $version found\n\n";
-
-my $builder = Module::Build->new (
-  module_name    => 'Term::Caca',
-  license        => 'unrestricted',
-
-  build_requires => {
-    'Test::More' => 0,
+my %module_build_args = (
+  'build_requires' => {
+    'Carp' => '0',
+    'Module::Build' => '0.3601',
+    'Scalar::Util' => '0',
+    'Test::More' => '0.94'
   },
-
-  script_files   => [
+  'configure_requires' => {
+    'Module::Build' => '0.3601'
+  },
+  'dist_abstract' => 'perl interface for libcaca (Colour AsCii Art library)',
+  'dist_author' => [
+    'John Beppu <beppu@cpan.org>',
+    'Yanick Champoux <yanick@cpan.org>'
   ],
-
-  extra_compiler_flags => scalar `caca-config --cflags`,
-  extra_linker_flags   => scalar `caca-config --libs`,
+  'dist_name' => 'Term-Caca',
+  'dist_version' => '1.0_0',
+  'license' => 'unrestricted',
+  'module_name' => 'Term::Caca',
+  'recommends' => {},
+  'recursive_test_files' => 1,
+  'requires' => {
+    'Const::Fast' => '0',
+    'DynaLoader' => '0',
+    'Exporter' => '0',
+    'List::MoreUtils' => '0',
+    'Method::Signatures' => '0',
+    'constant' => '0',
+    'parent' => '0',
+    'perl' => '5.10.0',
+    'vars' => '0'
+  },
+  'script_files' => []
 );
 
-$builder->create_build_script();
+
+my $build = MyBuild->new(%module_build_args);
+
+$build->create_build_script;

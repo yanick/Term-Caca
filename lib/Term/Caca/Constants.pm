@@ -1,11 +1,16 @@
 package Term::Caca::Constants;
+BEGIN {
+  $Term::Caca::Constants::AUTHORITY = 'cpan:yanick';
+}
+BEGIN {
+  $Term::Caca::Constants::VERSION = '1.0_0';
+}
+#ABSTRACT: libcaca constants from caca.h
 
 use strict;
 use warnings;
 use base 'Exporter';
 use vars qw(@EXPORT_OK %EXPORT_TAGS $VERSION);
-
-$VERSION = '0.9';
 
 use constant {
 
@@ -58,14 +63,15 @@ use constant {
 
   ## enum caca_event
 
-  CACA_EVENT_NONE               => 0x00000000,
-  CACA_EVENT_KEY_PRESS          => 0x01000000,
-  CACA_EVENT_KEY_RELEASE        => 0x02000000,
-  CACA_EVENT_MOUSE_PRESS        => 0x04000000,
-  CACA_EVENT_MOUSE_RELEASE      => 0x08000000,
-  CACA_EVENT_MOUSE_MOTION       => 0x10000000,
-  CACA_EVENT_RESIZE             => 0x20000000,
-  CACA_EVENT_ANY                => 0xff000000,
+    CACA_EVENT_NONE =>          0x0000,
+    CACA_EVENT_KEY_PRESS =>     0x0001,
+    CACA_EVENT_KEY_RELEASE =>   0x0002,
+    CACA_EVENT_MOUSE_PRESS =>   0x0004,
+    CACA_EVENT_MOUSE_RELEASE => 0x0008,
+    CACA_EVENT_MOUSE_MOTION =>  0x0010,
+    CACA_EVENT_RESIZE =>        0x0020,
+    CACA_EVENT_QUIT =>          0x0040,
+    CACA_EVENT_ANY =>           0xffff,
 
   ## enum caca_key
   CACA_KEY_UNKNOWN              => 0,
@@ -161,6 +167,7 @@ use constant {
   CACA_EVENT_MOUSE_RELEASE
   CACA_EVENT_MOUSE_MOTION
   CACA_EVENT_RESIZE
+  CACA_EVENT_QUIT
   CACA_EVENT_ANY
 
   CACA_KEY_UNKNOWN
@@ -254,6 +261,7 @@ use constant {
     CACA_EVENT_MOUSE_RELEASE
     CACA_EVENT_MOUSE_MOTION
     CACA_EVENT_RESIZE
+    CACA_EVENT_QUIT
     CACA_EVENT_ANY
   ) ],
 
@@ -308,11 +316,17 @@ use constant {
 
 1;
 
-__END__
+
+
+=pod
 
 =head1 NAME
 
 Term::Caca::Constants - libcaca constants from caca.h
+
+=head1 VERSION
+
+version 1.0_0
 
 =head1 SYNOPSIS
 
@@ -326,8 +340,33 @@ Only import the constants pertaining to events and keys:
 
 =head1 DESCRIPTION
 
+=head1 AUTHORS
 
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
 
 =cut
+
+
+__END__
+
+
 
 # $Id: Constants.pm,v 1.1 2004/10/18 21:00:56 beppu Exp $

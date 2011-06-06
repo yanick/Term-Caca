@@ -1,23 +1,31 @@
-package Term::Kaka::Bitmap;
+package Term::Caca::Event::Quit;
 BEGIN {
-  $Term::Kaka::Bitmap::AUTHORITY = 'cpan:yanick';
+  $Term::Caca::Event::Quit::AUTHORITY = 'cpan:yanick';
 }
 BEGIN {
-  $Term::Kaka::Bitmap::VERSION = '1.0_0';
+  $Term::Caca::Event::Quit::VERSION = '1.0_0';
 }
-#ABSTRACT: Term::Caca::Bitmap
 
 use strict;
-use base 'Term::Caca::Bitmap';
+use warnings;
+
+use parent 'Term::Caca::Event';
+use Term::Caca;
+use Method::Signatures;
+
+sub new {
+    my $class = shift;
+    return bless $class->SUPER::new( @_ ), $class;
+}
+
 1;
 
-
-
+__END__
 =pod
 
 =head1 NAME
 
-Term::Kaka::Bitmap - Term::Caca::Bitmap
+Term::Caca::Event::Quit
 
 =head1 VERSION
 
@@ -47,5 +55,3 @@ This is free software, licensed under:
 
 =cut
 
-
-__END__

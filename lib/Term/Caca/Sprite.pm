@@ -1,4 +1,11 @@
 package Term::Caca::Sprite;
+BEGIN {
+  $Term::Caca::Sprite::AUTHORITY = 'cpan:yanick';
+}
+BEGIN {
+  $Term::Caca::Sprite::VERSION = '1.0_0';
+}
+#ABSTRACT: an OO-interface to caca_sprite
 
 use strict;
 use warnings;
@@ -49,11 +56,17 @@ sub DESTROY {
 
 1;
 
-__END__
+
+
+=pod
 
 =head1 NAME
 
 Term::Caca::Sprite - an OO-interface to caca_sprite
+
+=head1 VERSION
+
+version 1.0_0
 
 =head1 SYNOPSIS
 
@@ -126,7 +139,6 @@ B<Example>:
 
 B<Example>:
 
-
 =head1 CLASS VARIABLES
 
 cvars
@@ -143,6 +155,33 @@ John BEPPU E<lt>beppu@cpan.orgE<gt>
 
 perl(1)
 
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
 =cut
+
+
+__END__
+
+
 
 # $Id$

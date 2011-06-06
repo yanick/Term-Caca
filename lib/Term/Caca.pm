@@ -1,34 +1,226 @@
 package Term::Caca;
+BEGIN {
+  $Term::Caca::AUTHORITY = 'cpan:yanick';
+}
+#ABSTRACT: perl interface for libcaca (Colour AsCii Art library)
 
-require Exporter;
-require DynaLoader;
-$VERSION = '0.97';
-@ISA = qw(Exporter DynaLoader);
-Term::Caca->bootstrap($VERSION);
-
+use 5.10.0;
 use strict;
 use warnings;
-use Term::Caca::Constants ':all';
+no warnings qw/ uninitialized /;
 
-# Basic functions
+our $VERSION = '1.0_0';
 
-# constructor
+use parent qw/ Exporter DynaLoader /;
+
+Term::Caca->bootstrap($VERSION);
+
+use Method::Signatures;
+use Const::Fast;
+use List::MoreUtils qw/ uniq /;
+
+use Term::Caca::Event::Key::Press;
+use Term::Caca::Event::Key::Release;
+use Term::Caca::Event::Mouse::Motion;
+use Term::Caca::Event::Mouse::Button::Press;
+use Term::Caca::Event::Mouse::Button::Release;
+use Term::Caca::Event::Resize;
+use Term::Caca::Event::Quit;
+
+
+our @EXPORT_OK;
+our %EXPORT_TAGS;
+
+
+
+const our %COLORS => (
+  BLACK              => 0,
+  BLUE               => 1,
+  GREEN              => 2,
+  CYAN               => 3,
+  RED                => 4,
+  MAGENTA            => 5,
+  BROWN              => 6,
+  LIGHTGRAY          => 7,
+  DARKGRAY           => 8,
+  LIGHTBLUE          => 9,
+  LIGHTGREEN         => 10,
+  LIGHTCYAN          => 11,
+  LIGHTRED           => 12,
+  LIGHTMAGENTA       => 13,
+  YELLOW             => 14,
+  WHITE              => 15,
+  DEFAULT            => 16,
+  TRANSPARENT        => 32,
+);
+
+const our $BLACK              => 0;
+const our $BLUE               => 1;
+const our $GREEN              => 2;
+const our $CYAN               => 3;
+const our $RED                => 4;
+const our $MAGENTA            => 5;
+const our $BROWN              => 6;
+const our $LIGHTGRAY          => 7;
+const our $DARKGRAY           => 8;
+const our $LIGHTBLUE          => 9;
+const our $LIGHTGREEN         => 10;
+const our $LIGHTCYAN          => 11;
+const our $LIGHTRED           => 12;
+const our $LIGHTMAGENTA       => 13;
+const our $YELLOW             => 14;
+const our $WHITE              => 15;
+const our $DEFAULT            => 16;
+const our $TRANSPARENT        => 32;
+
+$EXPORT_TAGS{colors} = [ map { '$'.$_ } keys %COLORS ];
+push @EXPORT_OK, '@COLORS', @{$EXPORT_TAGS{colors}};
+
+
+
+const our %EVENTS => (
+    NO_EVENT =>          0x0000,
+    KEY_PRESS =>     0x0001,
+    KEY_RELEASE =>   0x0002,
+    MOUSE_PRESS =>   0x0004,
+    MOUSE_RELEASE => 0x0008,
+    MOUSE_MOTION =>  0x0010,
+    RESIZE =>        0x0020,
+    QUIT =>          0x0040,
+    ANY_EVENT =>           0xffff,
+);
+
+const our $NO_EVENT =>          0x0000;
+const our $KEY_PRESS =>     0x0001;
+const our $KEY_RELEASE =>   0x0002;
+const our $MOUSE_PRESS =>   0x0004;
+const our $MOUSE_RELEASE => 0x0008;
+const our $MOUSE_MOTION =>  0x0010;
+const our $RESIZE =>        0x0020;
+const our $QUIT =>          0x0040;
+const our $ANY_EVENT =>           0xffff;
+
+$EXPORT_TAGS{events} = [ map { '$'.$_ } keys %EVENTS ];
+push @EXPORT_OK, '@EVENTS', @{$EXPORT_TAGS{events}};
+
+push @{$EXPORT_TAGS{all}}, uniq map { @$_ } values %EXPORT_TAGS;
+
+
 sub new {
-  my ($class) = @_;
-  _init();
-  my $self = { };
-  return bless($self => $class);
-}
-*init = \*new;
+  my $class = shift;
+  my $self = {};
+  bless $self, $class;
 
-# set delay for establishing constant framerate
-sub set_delay {
-  my ($self, $usec) = @_;
-  $usec ||= 0;
-  _set_delay($usec);
+  $self->{display} = _create_display();
+  $self->{canvas}  = _get_canvas($self->{display});
+
+  return $self;
+}
+
+method display {
+    return $self->{display};
+}
+
+method canvas {
+    return $self->{canvas};
+}
+
+
+method set_title ( $title ) {
+  _set_display_title($self->display, $title);
+
+  return $self;
+}
+
+
+method refresh {
+  _refresh($self->display);
+  return $self;
+}
+
+
+method set_refresh_delay ( $seconds ) {
+  _set_delay($self->display,int( $seconds * 1_000_000 ));
+  return $self;
+}
+
+
+method rendering_time {
+  return _get_delay($self->display)/1_000_000;
+}
+
+
+method clear () {
+  _clear($self->canvas);
+  return $self;
+}
+
+
+method canvas_size {
+    my @d = ( $self->canvas_width, $self->canvas_height );
+
+    return wantarray ? @d : \@d;
+}
+
+
+method canvas_width {
+  return _get_width($self->canvas);
+}
+
+
+method canvas_height {
+  return _get_height($self->canvas);
+}
+
+
+
+method mouse_position {
+    my @pos = ( _get_mouse_x( $self->display ), _get_mouse_y( $self->display ) );
+    return wantarray ? @pos : \@pos;
 }
 
 #
+sub get_mouse_x {
+# my ($self) = @_;
+  return _get_mouse_x();
+}
+
+#
+sub get_mouse_y {
+# my ($self) = @_;
+  return _get_mouse_y();
+}
+
+
+
+method set_ansi_color( $foreground, $background ) {
+    _set_ansi_color( $self->canvas, $foreground, $background );
+
+    return $self;
+}
+
+
+method set_color( $foreground, $background ) {
+    if ( exists $COLORS{uc $foreground} ) {
+        return $self->set_ansi_color( 
+            map { $COLORS{uc $_} } $foreground, $background 
+        );
+    }
+
+    _set_color( $self->canvas, map { _arg_to_color( $_ ) } $foreground, $background );
+
+    return $self;
+}
+
+sub _arg_to_color {
+    my $arg = shift;
+
+    return hex $arg unless ref $arg;
+
+    return hex sprintf "%x%x%x%x", @$arg;
+}
+
+
 sub get_feature {
   my ($self, $feature) = @_;
   $feature ||= 0;
@@ -49,82 +241,157 @@ sub get_feature_name {
   return _get_feature_name($feature);
 }
 
-#
-sub get_rendertime {
-# my ($self) = @_;
-  return _get_rendertime();
-}
-
-#
-sub get_width {
-# my ($self) = @_;
-  return _get_width();
-}
-
-#
-sub get_height {
-# my ($self) = @_;
-  return _get_height();
-}
-
-#
-sub set_window_title {
-  my ($self, $title) = @_;
-  $title ||= "";
-  return _set_window_title($title);
-}
-
-#
-sub get_window_width {
-# my ($self) = @_;
-  return _get_window_width();
-}
-
-#
-sub get_window_height {
-# my ($self) = @_;
-  return _get_window_height();
-}
-
-#
-sub refresh {
-  _refresh();
-}
-
-# destructor
 sub DESTROY {
-# my ($self) = @_;
-  _end();
+    my $self = shift;
+  _free_display( $self->{display} ) if $self->{display};
 }
 
-# Event handling
 
-#
-sub get_event {
-  my ($self, $event_mask) = @_;
-  if (!defined($event_mask)) {
-    $event_mask = 0xFFFFFFFF;
+method text ( $coord, $text ) {
+    length $text > 1 
+        ? _putstr( $self->canvas, @$coord, $text )
+        : _putchar( $self->canvas, @$coord, $text );        
+
+    return $self;
+}
+
+
+method char ( $coord, $char ) {
+    _putchar( $self->canvas, @$coord, substr $char, 0, 1 );
+
+    return $self;
+}
+
+
+method line ( $pa, $pb, :$char = undef ) {
+    defined ( $char ) 
+    ?  _draw_line($self->canvas, @$pa, @$pb, $char)
+    : _draw_thin_line($self->canvas,  @$pa, @$pb );
+
+    return $self;
+}
+
+
+method polyline( $points, :$char = undef, :$close = 0 ) {
+    my @x = map { $_->[0] } @$points;
+    my @y = map { $_->[1] } @$points;
+    my $n = @x - !$close;
+
+    $char ? _draw_polyline( $self->canvas, \@x, \@y, $n, $char )
+          : _draw_thin_polyline( $self->canvas, \@x, \@y, $n );
+
+    return $self;
+}
+
+
+method circle ( $center, $radius, :$char = undef, :$fill = undef ) {
+    $char //= $fill;
+
+    my @args = ( $self->canvas, @$center, $radius );
+
+    if ( not defined $char ) {
+        _draw_thin_ellipse( @args, $radius );
+    }
+    else {
+        if ( defined $fill ) {
+            _fill_ellipse( @args, $radius, $char );
+        }
+        else {
+            _draw_circle( @args, $char );
+        }
+    }
+
+  return $self;
+}
+
+
+method ellipse ( $center, $rx, $ry, :$char = undef, :$fill = undef ) {
+    $char //= $fill;
+
+    if ( defined $fill ) {
+        _fill_ellipse($self->canvas,@$center,$rx,$ry,$char);
+    }
+    elsif( defined $char ) {
+        _draw_ellipse($self->canvas,@$center,$rx,$ry,$char);
+    }
+    else {
+        _draw_thin_ellipse($self->canvas,@$center,$rx,$ry);
+    }
+
+  return $self;
+}
+
+
+
+method box  ( $center, $width, $height, :$char = undef, :$fill = undef ){
+  $char //= $fill;
+
+  my @args = ( $self->canvas, @$center, $width, $height );
+
+  if ( defined $fill ) {
+    _fill_box(@args, $char);
   }
-  return _get_event($event_mask);
+  elsif( defined $char ) {
+    _draw_box(@args, $char);
+  }
+  else {
+    _draw_thin_box(@args);
+  }
+
+  return $self;
 }
 
-#
-sub get_mouse_x {
-# my ($self) = @_;
-  return _get_mouse_x();
+
+method triangle  ( $pa, $pb, $pc, :$char = undef, :$fill = undef ){
+  $char //= $fill;
+
+  my @args = ( $self->canvas, @$pa, @$pb, @$pc );
+
+  if ( defined $fill ) {
+    _fill_triangle(@args, $char);
+  }
+  elsif( defined $char ) {
+    _draw_triangle(@args, $char);
+  }
+  else {
+    _draw_thin_triangle(@args);
+  }
+
+  return $self;
 }
 
-#
-sub get_mouse_y {
-# my ($self) = @_;
-  return _get_mouse_y();
-}
 
-#
-sub wait_event {
-  my ($self, $event_mask) = @_;
-  $event_mask ||= CACA_EVENT_ANY;
-  return _wait_event($event_mask);
+method wait_for_event ( :$mask = $ANY_EVENT, :$timeout = 0 ) {
+  my $event = _get_event( $self->display, $mask, int($timeout*1_000_000), defined wantarray )
+      or return;
+
+  given ( _get_event_type( $event ) ) {
+    when ( $KEY_PRESS ) {
+        return Term::Caca::Event::Key::Press->new( event => $event );
+    }
+    when ( $KEY_RELEASE ) {
+        return Term::Caca::Event::Key::Release->new( event => $event );
+    }
+    when ( $MOUSE_MOTION ) {
+        return Term::Caca::Event::Mouse::Motion->new( event => $event );
+    }
+    when ( $MOUSE_PRESS ) {
+        return Term::Caca::Event::Mouse::Button::Press->new( event => $event );
+    }
+    when ( $MOUSE_RELEASE ) {
+        return Term::Caca::Event::Mouse::Button::Release->new( event => $event );
+    }
+    when ( $RESIZE ) {
+        return Term::Caca::Event::Resize->new( event => $event );
+    }
+    when ( $QUIT ) {
+        return Term::Caca::Event::Quit->new( event => $event );
+    }
+    default {
+        return;
+    }
+  }
+
 }
 
 1;
@@ -132,24 +399,6 @@ sub wait_event {
 # Character printing
 
 #
-sub set_color {
-  my ($self, $fgcolor, $bgcolor) = @_;
-  $fgcolor ||= CACA_COLOR_LIGHTGRAY;
-  $bgcolor ||= CACA_COLOR_BLACK;
-  return _set_color($fgcolor, $bgcolor);
-}
-
-#
-sub get_fg_color {
-# my ($self) = @_;
-  return _get_fg_color();
-}
-
-#
-sub get_bg_color {
-# my ($self) = @_;
-  return _get_bg_color();
-}
 
 #
 sub get_color_name {
@@ -158,138 +407,6 @@ sub get_color_name {
   return _get_color_name($color);
 }
 
-#
-sub putchar {
-  my ($self, $x, $y, $c) = @_;
-  $x ||= 0;
-  $y ||= 0;
-  $c ||= "";
-  _putchar($x, $y, $c);
-}
-
-#
-sub putstr {
-  my ($self, $x, $y, $s) = @_;
-  $x ||= 0;
-  $y ||= 0;
-  $s ||= "";
-  _putstr($x, $y, $s);
-}
-
-# faking it by doing printf on the perl side
-sub printf {
-  my ($self, $x, $y, $s, @args) = @_;
-  $x ||= 0;
-  $y ||= 0;
-  my $string = sprintf($s, @args);
-  _putstr($x, $y, $string);
-}
-
-#
-sub clear {
-  _clear();
-}
-
-# Primitives drawing
-
-#
-sub draw_line {
-  my ($self, $x1, $y1, $x2, $y2, $c) = @_;
-  _draw_line($x1, $y1, $x2, $y2, $c);
-}
-
-#
-sub draw_polyline {
-  my ($self, $x, $y, $n, $c) = @_;
-  _draw_polyline($x, $y, $n, $c);
-}
-
-#
-sub draw_thin_line {
-  my ($self, $x1, $y1, $x2, $y2) = @_;
-  _draw_thin_line($x1, $y1, $x2, $y2);
-}
-
-#
-sub draw_thin_polyline {
-  my ($self, $x, $y, $n) = @_;
-  _draw_thin_polyline($x, $y, $n);
-}
-
-#
-sub draw_circle {
-  my ($self, $x, $y, $r, $c) = @_;
-  # TODO : check for sane values
-  _draw_circle($x, $y, $r, $c);
-}
-
-#
-sub draw_ellipse {
-  my ($self, $x0, $y0, $ra, $rb, $c) = @_;
-  _draw_ellipse($x0, $y0, $ra, $rb, $c);
-}
-
-#
-sub draw_thin_ellipse {
-  my ($self, $x0, $y0, $ra, $rb) = @_;
-  _draw_thin_ellipse($x0, $y0, $ra, $rb);
-}
-
-#
-sub fill_ellipse {
-  my ($self, $x0, $y0, $ra, $rb, $c) = @_;
-  _fill_ellipse($x0, $y0, $ra, $rb, $c);
-}
-
-#
-sub draw_box {
-  my ($self, $x0, $y0, $x1, $y1, $c) = @_;
-  _draw_box($x0, $y0, $x1, $y1, $c);
-}
-
-#
-sub draw_thin_box {
-  my ($self, $x0, $y0, $x1, $y1) = @_;
-  _draw_thin_box($x0, $y0, $x1, $y1);
-}
-
-#
-sub fill_box {
-  my ($self, $x0, $y0, $x1, $y1, $c) = @_;
-  _fill_box($x0, $y0, $x1, $y1, $c);
-}
-
-#
-sub draw_triangle {
-  my ($self, $x0, $y0, $x1, $y1, $x2, $y2, $c) = @_;
-  _draw_triangle($x0, $y0, $x1, $y1, $x2, $y2, $c);
-}
-
-#
-sub draw_thin_triangle {
-  my ($self, $x0, $y0, $x1, $y1, $x2, $y2) = @_;
-  _draw_thin_triangle($x0, $y0, $x1, $y1, $x2, $y2);
-}
-
-#
-sub fill_triangle {
-  my ($self, $x0, $y0, $x1, $y1, $x2, $y2, $c) = @_;
-  _fill_triangle($x0, $y0, $x1, $y1, $x2, $y2, $c);
-}
-
-# Mathematical functions
-
-#
-sub rand {
-  my ($self, $min, $max) = @_;
-  return _rand($min, $max);
-}
-
-#
-sub sqrt {
-  my ($self, $n) = @_;
-  return _sqrt($n);
-}
 
 # Sprite handling
 
@@ -395,186 +512,316 @@ sub free_bitmap {
   my ($self, $bitmap) = @_;
   _free_bitmap($bitmap);
 }
+'end of Term::Caca';
 
-__END__
+
+
+=pod
 
 =head1 NAME
 
 Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
+=head1 VERSION
+
+version 1.0_0
+
 =head1 SYNOPSIS
 
-Usage:
-
   use Term::Caca;
-  my $caca = Term::Caca->init();
-  $caca->putstr(5, 5, "pwn3d");
-  $caca->refresh();
+
+  my $caca = Term::Caca->new;
+  $caca->text( [5, 5], "pwn3d");
+  $caca->refresh;
   sleep 3;
 
 =head1 DESCRIPTION
 
-=head2 Methods
+C<Term::Caca> is an API for the ASCII drawing library I<libcaca>.
 
-=head3 init
+This version of C<Term::Caca> is compatible with the I<1.x> version of 
+the libcaca library (development has been made against version 
+0.99.beta17 of the library).
+
+# exports
+
+=head1 EXPORTS
+
+    use Term::Caca qw/ :all /;          # import all 
+    # or
+    use Term::Caca qw/ :colors /;       # import specific group 
+    # or
+    use Term::Caca qw/ $LIGHTRED /;     # import specific constant 
+
+=head2 COLORS
+
+    use Term::Caca qw/ :colors /;           # import all colors
+    # or 
+    use Term::Caca qw/ $WHITE $LIGHTRED /;  # import specific colors
+    # or 
+    use Term::Caca qw/ %COLORS /;           # import colors as a hash
+    # or
+    print $Term::Caca::COLORS{WHITE}        # use original array directly
+
+The color constants used by C<set_ansi_color()>. The available colors are
+
+  BLACK       BLUE        GREEN       CYAN          RED                 
+  MAGENTA     BROWN       LIGHTGRAY   DARKGRAY      LIGHTBLUE           
+  LIGHTGREEN  LIGHTCYAN   LIGHTRED    LIGHTMAGENTA  YELLOW              
+  WHITE       DEFAULT     TRANSPARENT         
+
+=head2 EVENTS
+
+    use Term::Caca qw/ :events /;                 # import all events
+    # or 
+    use Term::Caca qw/ $NO_EVENT $KEY_RELEASE /;  # import specific events
+    # or 
+    use Term::Caca qw/ %EVENTS /;                 # import events as a hash
+    # or
+    print $Term::Caca::EVENTS{MOUSE_PRESS}        # use original array directly
+
+The event constants used by the mask of C<wait_for_event()>. The available
+events are
+
+    NO_EVENT    ANY_EVENT
+    KEY_PRESS   KEY_RELEASE
+    MOUSE_PRESS MOUSE_RELEASE   MOUSE_MOTION
+    RESIZE      QUIT
+
+=head1 METHODS
+
+=head2 Constructor
 
 =head3 new
 
-This method instantiates a Term::Caca object.  (Note that init() is an alias for new()
-and that they may be used interchangeably.)
+Instantiates a Term::Caca object. 
 
-=head3 set_delay
+=head2 Display and Canvas
 
-Set the amount of time in milliseconds between frames to establish
-a constant frame rate
+=head3 set_title( $title )
 
-=head3 get_feature
+Sets the window title to I<$title>. 
 
-=head3 set_feature
-
-=head3 get_feature_name
-
-=head3 get_rendertime
-
-=head3 get_width
-
-=head3 get_height
-
-=head3 set_window_title
-
-=head3 get_window_width
-
-=head3 get_window_height
+Returns the invocant I<Term::Caca> object.
 
 =head3 refresh
 
-=head3 get_event
+Refreshes the display.
 
-=head3 get_mouse_x
+Returns the invocant I<Term::Caca> object.
 
-=head3 get_mouse_y
+=head3 set_refresh_delay( $seconds )
 
-=head3 wait_event
+Sets the refresh delay in seconds. The refresh delay is used by                                                                
+C<refresh> to achieve constant framerate.
 
-=head3 set_color
+If the time is zero, constant framerate is disabled. This is the
+default behaviour.                                                                                                                 
 
-=head3 get_fg_color
+Returns the invocant I<Term::Caca> object.
 
-=head3 get_bg_color
+=head3 rendering_time()
 
-=head3 get_color_name
+Returns the average rendering time, which is measured as the time between
+two C<refresh()> calls, in seconds. If constant framerate is enabled via
+C<set_refresh_delay()>, the average rendering time will be close to the 
+requested delay even if the real rendering time was shorter.                                   
 
-=head3 putchar
+=head3 clear()
 
-=head3 putstr
+Clears the canvas using the current background color.
 
-=head3 printf
+Returns the invocant object.
 
-=head3 clear
+=head3 canvas_size
 
-=head3 draw_line( $x1, $y1, $x2, $y2, $char )
+Returns the width and height of the canvas,
+as a list in an array context, as a array ref
+in a scalar context.
 
-Draws a line from I<($x1,$y2)> to I<($x2,$y2)>
-using the character I<$char>.
+=head2 canvas_width
 
-=head3 draw_thin_line( $x1, $y1, $x2, $y2 )
+Returns the canvas width.
 
-Draws a line from I<($x1,$y2)> to I<($x2,$y2)>
-using ascii art.
+=head3 canvas_height
 
-=head3 draw_polyline
+Returns the canvas height.
 
+=head3 mouse_position 
 
-=head3 draw_thin_polyline
+Returns the position of the mouse. In a list context, returns
+the I<x>, I<y> coordinates, in a scalar context returns them as an
+array ref.
 
-=head3 draw_circle( $x, $y, $r, $char );
+This function is not reliable if the ncurses or S-Lang                                                            
+drivers are being used, because mouse position is only detected when                                                               
+the mouse is clicked. Other drivers such as X11 work well.
 
-Draws a circle centered at I<($x,$y)> with a radius
-of I<$r> using the character I<$char>.
+=head2 Colors
 
-=head3 draw_ellipse( $x, $y, $radius_x, $radius_y, $char )
+=head3 set_ansi_color( $foreground, $background )
 
-Draws an ellipse centered at I<($x,$y)> with an x-axis
+Sets the foreground and background colors used by primitives,
+using colors as defined by C<%COLORS>.
+
+    $t->set_ansi_color( $LIGHTRED, $WHITE );
+
+Returns the invocant object.
+
+=head3 set_color( $foreground, $background ) 
+
+Sets the foreground and background colors used by primitives. 
+
+Each color is an array ref to a ARGB (transparency + RGB) set of values,
+all between 0 and 15. Alternatively, they can be given as a string of the direct
+hexadecimal value.
+
+    # red on white
+    $t->set_color( [ 15, 15, 0, 0 ], 'ffff' );
+
+Returns the invocant object.
+
+=head2 Text
+
+=head3 text( \@coord, $text )
+
+Prints I<$text> at the given coordinates.
+
+Returns the invocant C<Term::Caca> object.
+
+=head3 char( \@coord, $char )
+
+Prints the character I<$char> at the given coordinates.
+If I<$char> is a string of more than one character, only
+the first character is printed.
+
+Returns the invocant C<Term::Caca> object.
+
+=head2 Primitives Drawing
+
+=head3 line( \@point_a, \@point_b, :$char = undef )
+
+Draws a line from I<@point_a> to I<@point_b>
+using the character I<$char> or, if undefined,
+ascii art.
+
+Returns the invocant object.
+
+=head3 polyline( \@points, :$char = undef , :$close = 0 ) 
+
+Draws the polyline defined by I<@points>, where each point is an array ref
+of the coordinates. E.g.
+
+    $t->polyline( [ [ 0,0 ], [ 10,15 ], [ 20, 15 ] ] );
+
+The lines are drawn using I<$char> or, if not specified, using ascii art.
+
+If I<$close> is true, the end point of the polyline will 
+be connected to the first point.
+
+Returns the invocant I<Term::Caca> object.
+
+=head3 circle( \@center, $radius, :$char = '*' )
+
+Draws a circle centered at I<@center> with a radius
+of I<$radius> using the character I<$char> or, if not defined,
+ascii art. if I<$fill> is set to true, the circle is filled with I<$char>
+as well.
+
+If I<$fill> is defined but I<$char> is not, I<$fill> will be taken as
+the filling character. I.e.,
+
+    $c->circle( [10,10], 5, char => 'x', fill => 1 );
+    # equivalent to 
+    $c->circle( [10,10], 5, fill => 'x' );
+
+Returns the invocant object.
+
+=head3 ellipse( \@center, $radius_x, $radius_y, :$char = undef, :$fill = undef)
+
+Draws an ellipse centered at I<@center> with an x-axis
 radius of I<$radius_x> and a y-radius of I<$radius_y>
-using the character I<$char>.
+using the character I<$char> or, if not defined, ascii art.
 
-=head3 draw_thin_ellipse( $x, $y, $radius_x, $radius_y )
+If I<$fill> is defined but I<$char> is not, I<$fill> will be taken as
+the filling character.
 
-Draws an ellipse centered at I<($x,$y)> with an x-axis
-radius of I<$radius_x> and a y-radius of I<$radius_y>
-using ascii art.
+Returns the invocant object.
 
-=head3 fill_ellipse
+=head3 box( \@top_corner, $width, $height, :$char => undef, :$fill => undef )
 
-=head3 draw_box
+Draws a rectangle of dimensions I<$width> and
+I<$height> with its upper-left corner at I<@top_corner>,
+using the character I<$char> or, if not defined, ascii art. 
 
-=head3 draw_thin_box
+If I<$fill> is defined but I<$char> is not, I<$fill> will be taken as
+the filling character.
 
-=head3 fill_box
+Returns the invocant object.
 
-=head3 draw_triangle
+=head3 triangle( \@point_a, \@point_b, \@point_c, :$char => undef, :$fill => undef )
 
-=head3 draw_thin_triangle
+Draws a triangle defined by the three given points
+using the character I<$char> or, if not defined, ascii art. 
 
-=head3 fill_triangle
+If I<$fill> is defined but I<$char> is not, I<$fill> will be taken as
+the filling character.
 
-=head3 rand
+Returns the invocant object.
 
-=head3 sqrt
+=head2 Event Handling
 
-=head3 load_sprite
+=head3 wait_for_event( :$mask = $ANY_EVENT, :$timeout = 0 )
 
-=head3 get_sprite_frames
+Waits and returns a C<Term::Caca::Event> object matching the mask.
 
-=head3 get_sprite_width
+C<$timeout> is in seconds. If set to 0, the method returns immediatly and,
+if no event was found, returns nothing. If C<$timeout> is negative,
+the method waits forever for an event matching the mask.
 
-=head3 get_sprite_height
+    # wait for 5 seconds for a key press or the closing of the window
+    my $event = $t->wait_for_event( 
+        mask => $KEY_PRESS | $QUIT, 
+        timeout => 5 
+    );
 
-=head3 get_sprite_dx
+    say "user is idle" unless defined $event;
 
-=head3 get_sprite_dy
+    exit if $event->isa( 'Term::Caca::Event::Quit' );
 
-=head3 draw_sprite
-
-=head3 free_sprite
-
-=head3 create_bitmap
-
-=head3 set_bitmap_palette
-
-=head3 draw_bitmap
-
-=head3 free_bitmap
-
-=head1 LICENSE
-
-            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-                    Version 2, December 2004
-
- Copyright (C) 2004 Sam Hocevar
-  22 rue de Plaisance, 75014 Paris, France
- Everyone is permitted to copy and distribute verbatim or modified
- copies of this license document, and changing it is allowed as long
- as the name is changed.
-
-            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-
-  0. You just DO WHAT THE FUCK YOU WANT TO.
-
-=head1 AUTHOR
-
-John Beppu E<lt>beppu@cpan.orgE<gt>
+    say "user typed ", $event->char;
 
 =head1 SEE ALSO
 
-L<Term::Caca::Constants|Term::Caca::Constants>,
-L<Term::Caca::Sprite|Term::Caca::Sprite>,
-L<Term::Caca::Bitmap|Term::Caca::Bitmap>,
+libcaca - L<http://caca.zoy.org/>
 
 L<Term::Kaka|Term::Kaka>
 
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
 =cut
 
-# vim:sw=2 sts=2 expandtab
-# $Id: Caca.pm,v 1.5 2004/10/25 18:14:57 beppu Exp $
+
+__END__
+
+

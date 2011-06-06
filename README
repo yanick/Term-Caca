@@ -1,30 +1,251 @@
-___________                           _________
-\__    ___/__________  _____   /\  /\ \_   ___ \_____    ____ _____
-  |    |_/ __ \_  __ \/     \  \/  \/ /    \  \/\__  \ _/ ___\\__  \
-  |    |\  ___/|  | \/  Y Y  \ /\  /\ \     \____/ __ \\  \___ / __ \_
-  |____| \___  >__|  |__|_|  / \/  \/  \______  (____  /\___  >____  /
-             \/            \/                 \/     \/     \/     \/
+NAME
+    Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
---]- a perl wrapper around libcaca (Colour AsCii Art library)
-                                    ^      ^ ^   ^
-        http://sam.zoy.org/projects/libcaca/
+VERSION
+    version 1.0_0
 
+SYNOPSIS
+      use Term::Caca;
 
---]- a note about versioning,
+      my $caca = Term::Caca->new;
+      $caca->text( [5, 5], "pwn3d");
+      $caca->refresh;
+      sleep 3;
 
-        Term-Caca-x.y_z.tar.gz
-                  | | ^--------- sub-version of this perl wrapper
-                  | |
-                  `-`----------- version of libcaca c library
-                                 this wrapper is based on.
+DESCRIPTION
+    "Term::Caca" is an API for the ASCII drawing library *libcaca*.
 
---]- WARNING
+    This version of "Term::Caca" is compatible with the *1.x* version of the
+    libcaca library (development has been made against version 0.99.beta17
+    of the library).
 
-	Unfortunately, I haven't gotten around to writing proper POD
-	yet, so those who wish to try these modules out are asked to
-	use the source as a reference.  The libcaca documentation for
-	the C library upon which this package is based is also a good
-	place to look for help.  You'll find that Term::Caca's API
-	closely mirrors that of the C library.  The next release will
-	be proplerly documented.
-	
+    # exports
+
+EXPORTS
+        use Term::Caca qw/ :all /;          # import all 
+        # or
+        use Term::Caca qw/ :colors /;       # import specific group 
+        # or
+        use Term::Caca qw/ $LIGHTRED /;     # import specific constant
+
+  COLORS
+        use Term::Caca qw/ :colors /;           # import all colors
+        # or 
+        use Term::Caca qw/ $WHITE $LIGHTRED /;  # import specific colors
+        # or 
+        use Term::Caca qw/ %COLORS /;           # import colors as a hash
+        # or
+        print $Term::Caca::COLORS{WHITE}        # use original array directly
+
+    The color constants used by "set_ansi_color()". The available colors are
+
+      BLACK       BLUE        GREEN       CYAN          RED                 
+      MAGENTA     BROWN       LIGHTGRAY   DARKGRAY      LIGHTBLUE           
+      LIGHTGREEN  LIGHTCYAN   LIGHTRED    LIGHTMAGENTA  YELLOW              
+      WHITE       DEFAULT     TRANSPARENT
+
+  EVENTS
+        use Term::Caca qw/ :events /;                 # import all events
+        # or 
+        use Term::Caca qw/ $NO_EVENT $KEY_RELEASE /;  # import specific events
+        # or 
+        use Term::Caca qw/ %EVENTS /;                 # import events as a hash
+        # or
+        print $Term::Caca::EVENTS{MOUSE_PRESS}        # use original array directly
+
+    The event constants used by the mask of "wait_for_event()". The
+    available events are
+
+        NO_EVENT    ANY_EVENT
+        KEY_PRESS   KEY_RELEASE
+        MOUSE_PRESS MOUSE_RELEASE   MOUSE_MOTION
+        RESIZE      QUIT
+
+METHODS
+  Constructor
+   new
+    Instantiates a Term::Caca object.
+
+  Display and Canvas
+   set_title( $title )
+    Sets the window title to *$title*.
+
+    Returns the invocant *Term::Caca* object.
+
+   refresh
+    Refreshes the display.
+
+    Returns the invocant *Term::Caca* object.
+
+   set_refresh_delay( $seconds )
+    Sets the refresh delay in seconds. The refresh delay is used by
+    "refresh" to achieve constant framerate.
+
+    If the time is zero, constant framerate is disabled. This is the default
+    behaviour.
+
+    Returns the invocant *Term::Caca* object.
+
+   rendering_time()
+    Returns the average rendering time, which is measured as the time
+    between two "refresh()" calls, in seconds. If constant framerate is
+    enabled via "set_refresh_delay()", the average rendering time will be
+    close to the requested delay even if the real rendering time was
+    shorter.
+
+   clear()
+    Clears the canvas using the current background color.
+
+    Returns the invocant object.
+
+   canvas_size
+    Returns the width and height of the canvas, as a list in an array
+    context, as a array ref in a scalar context.
+
+  canvas_width
+    Returns the canvas width.
+
+   canvas_height
+    Returns the canvas height.
+
+   mouse_position
+    Returns the position of the mouse. In a list context, returns the *x*,
+    *y* coordinates, in a scalar context returns them as an array ref.
+
+    This function is not reliable if the ncurses or S-Lang drivers are being
+    used, because mouse position is only detected when the mouse is clicked.
+    Other drivers such as X11 work well.
+
+  Colors
+   set_ansi_color( $foreground, $background )
+    Sets the foreground and background colors used by primitives, using
+    colors as defined by %COLORS.
+
+        $t->set_ansi_color( $LIGHTRED, $WHITE );
+
+    Returns the invocant object.
+
+   set_color( $foreground, $background )
+    Sets the foreground and background colors used by primitives.
+
+    Each color is an array ref to a ARGB (transparency + RGB) set of values,
+    all between 0 and 15. Alternatively, they can be given as a string of
+    the direct hexadecimal value.
+
+        # red on white
+        $t->set_color( [ 15, 15, 0, 0 ], 'ffff' );
+
+    Returns the invocant object.
+
+  Text
+   text( \@coord, $text )
+    Prints *$text* at the given coordinates.
+
+    Returns the invocant "Term::Caca" object.
+
+   char( \@coord, $char )
+    Prints the character *$char* at the given coordinates. If *$char* is a
+    string of more than one character, only the first character is printed.
+
+    Returns the invocant "Term::Caca" object.
+
+  Primitives Drawing
+   line( \@point_a, \@point_b, :$char = undef )
+    Draws a line from *@point_a* to *@point_b* using the character *$char*
+    or, if undefined, ascii art.
+
+    Returns the invocant object.
+
+   polyline( \@points, :$char = undef , :$close = 0 )
+    Draws the polyline defined by *@points*, where each point is an array
+    ref of the coordinates. E.g.
+
+        $t->polyline( [ [ 0,0 ], [ 10,15 ], [ 20, 15 ] ] );
+
+    The lines are drawn using *$char* or, if not specified, using ascii art.
+
+    If *$close* is true, the end point of the polyline will be connected to
+    the first point.
+
+    Returns the invocant *Term::Caca* object.
+
+   circle( \@center, $radius, :$char = '*' )
+    Draws a circle centered at *@center* with a radius of *$radius* using
+    the character *$char* or, if not defined, ascii art. if *$fill* is set
+    to true, the circle is filled with *$char* as well.
+
+    If *$fill* is defined but *$char* is not, *$fill* will be taken as the
+    filling character. I.e.,
+
+        $c->circle( [10,10], 5, char => 'x', fill => 1 );
+        # equivalent to 
+        $c->circle( [10,10], 5, fill => 'x' );
+
+    Returns the invocant object.
+
+   ellipse( \@center, $radius_x, $radius_y, :$char = undef, :$fill = undef)
+    Draws an ellipse centered at *@center* with an x-axis radius of
+    *$radius_x* and a y-radius of *$radius_y* using the character *$char*
+    or, if not defined, ascii art.
+
+    If *$fill* is defined but *$char* is not, *$fill* will be taken as the
+    filling character.
+
+    Returns the invocant object.
+
+   box( \@top_corner, $width, $height, :$char => undef, :$fill => undef )
+    Draws a rectangle of dimensions *$width* and *$height* with its
+    upper-left corner at *@top_corner*, using the character *$char* or, if
+    not defined, ascii art.
+
+    If *$fill* is defined but *$char* is not, *$fill* will be taken as the
+    filling character.
+
+    Returns the invocant object.
+
+   triangle( \@point_a, \@point_b, \@point_c, :$char => undef, :$fill => undef )
+    Draws a triangle defined by the three given points using the character
+    *$char* or, if not defined, ascii art.
+
+    If *$fill* is defined but *$char* is not, *$fill* will be taken as the
+    filling character.
+
+    Returns the invocant object.
+
+  Event Handling
+   wait_for_event( :$mask = $ANY_EVENT, :$timeout = 0 )
+    Waits and returns a "Term::Caca::Event" object matching the mask.
+
+    $timeout is in seconds. If set to 0, the method returns immediatly and,
+    if no event was found, returns nothing. If $timeout is negative, the
+    method waits forever for an event matching the mask.
+
+        # wait for 5 seconds for a key press or the closing of the window
+        my $event = $t->wait_for_event( 
+            mask => $KEY_PRESS | $QUIT, 
+            timeout => 5 
+        );
+
+        say "user is idle" unless defined $event;
+
+        exit if $event->isa( 'Term::Caca::Event::Quit' );
+
+        say "user typed ", $event->char;
+
+SEE ALSO
+    libcaca - <http://caca.zoy.org/>
+
+    Term::Kaka
+
+AUTHORS
+    *   John Beppu <beppu@cpan.org>
+
+    *   Yanick Champoux <yanick@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by John Beppu.
+
+    This is free software, licensed under:
+
+      DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+

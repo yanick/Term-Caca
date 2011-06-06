@@ -1,13 +1,17 @@
 ---
 abstract: 'perl interface for libcaca (Colour AsCii Art library)'
 author:
-  - 'John Beppu E<lt>beppu@cpan.orgE<gt>'
+  - 'John Beppu <beppu@cpan.org>'
+  - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
-  ExtUtils::CBuilder: 0
-  Test::More: 0
+  Carp: 0
+  Module::Build: 0.3601
+  Scalar::Util: 0
+  Test::More: 0.94
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3603'
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.101590'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,20 +20,71 @@ name: Term-Caca
 provides:
   Term::Caca:
     file: lib/Term/Caca.pm
-    version: 0.97
+    version: 1.0_0
   Term::Caca::Bitmap:
     file: lib/Term/Caca/Bitmap.pm
+    version: 1.0_0
   Term::Caca::Constants:
     file: lib/Term/Caca/Constants.pm
-    version: 0.9
+    version: 1.0_0
+  Term::Caca::Event:
+    file: lib/Term/Caca/Event.pm
+    version: 1.0_0
+  Term::Caca::Event::Key:
+    file: lib/Term/Caca/Event/Key.pm
+    version: 1.0_0
+  Term::Caca::Event::Key::Press:
+    file: lib/Term/Caca/Event/Key/Press.pm
+    version: 1.0_0
+  Term::Caca::Event::Key::Release:
+    file: lib/Term/Caca/Event/Key/Release.pm
+    version: 1.0_0
+  Term::Caca::Event::Mouse::Button:
+    file: lib/Term/Caca/Event/Mouse/Button.pm
+    version: 1.0_0
+  Term::Caca::Event::Mouse::Button::Press:
+    file: lib/Term/Caca/Event/Mouse/Button/Press.pm
+    version: 1.0_0
+  Term::Caca::Event::Mouse::Button::Release:
+    file: lib/Term/Caca/Event/Mouse/Button/Release.pm
+    version: 1.0_0
+  Term::Caca::Event::Mouse::Motion:
+    file: lib/Term/Caca/Event/Mouse/Motion.pm
+    version: 1.0_0
+  Term::Caca::Event::Quit:
+    file: lib/Term/Caca/Event/Quit.pm
+    version: 1.0_0
+  Term::Caca::Event::Resize:
+    file: lib/Term/Caca/Event/Resize.pm
+    version: 1.0_0
   Term::Caca::Sprite:
     file: lib/Term/Caca/Sprite.pm
+    version: 1.0_0
   Term::Kaka:
     file: lib/Term/Kaka.pm
+    version: 1.0_0
   Term::Kaka::Bitmap:
     file: lib/Term/Kaka/Bitmap.pm
+    version: 1.0_0
   Term::Kaka::Constants:
     file: lib/Term/Kaka/Constants.pm
+    version: 1.0_0
   Term::Kaka::Sprite:
     file: lib/Term/Kaka/Sprite.pm
-version: 0.97
+    version: 1.0_0
+requires:
+  Const::Fast: 0
+  DynaLoader: 0
+  Exporter: 0
+  List::MoreUtils: 0
+  Method::Signatures: 0
+  constant: 0
+  parent: 0
+  perl: 5.10.0
+  vars: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Term-Caca
+  homepage: http://search.cpan.org/dist/Term-Caca/
+  repository: git://github.com/yanick/Term-Caca.git
+version: 1.0_0
+x_authority: cpan:yanick

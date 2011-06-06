@@ -1,4 +1,11 @@
 package Term::Caca::Bitmap;
+BEGIN {
+  $Term::Caca::Bitmap::AUTHORITY = 'cpan:yanick';
+}
+BEGIN {
+  $Term::Caca::Bitmap::VERSION = '1.0_0';
+}
+#ABSTRACT: an OO-interface to caca_bitmap
 
 use strict;
 use warnings;
@@ -27,12 +34,17 @@ sub DESTROY {
 
 1;
 
-__END__
 
+
+=pod
 
 =head1 NAME
 
 Term::Caca::Bitmap - an OO-interface to caca_bitmap
+
+=head1 VERSION
+
+version 1.0_0
 
 =head1 SYNOPSIS
 
@@ -72,7 +84,6 @@ B<Example>:
 
 B<Example>:
 
-
 =head1 CLASS VARIABLES
 
 cvars
@@ -89,6 +100,34 @@ John BEPPU E<lt>beppu@cpan.orgE<gt>
 
 perl(1)
 
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
 =cut
+
+
+__END__
+
+
+
 
 # $Id: pmpod,v 1.3 2004/10/28 07:37:32 beppu Exp $

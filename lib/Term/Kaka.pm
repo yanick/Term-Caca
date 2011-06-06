@@ -1,13 +1,27 @@
 package Term::Kaka;
+BEGIN {
+  $Term::Kaka::AUTHORITY = 'cpan:yanick';
+}
+BEGIN {
+  $Term::Kaka::VERSION = '1.0_0';
+}
+#ABSTRACT: a subclass of Term::Caca with virtually identical behavior
+
 use strict;
 use base 'Term::Caca';
 1;
 
-__END__
+
+
+=pod
 
 =head1 NAME
 
 Term::Kaka - a subclass of Term::Caca with virtually identical behavior
+
+=head1 VERSION
+
+version 1.0_0
 
 =head1 SYNOPSIS
 
@@ -67,6 +81,32 @@ B<Pip Stuart> to me
 ...as opposed to 'caca', and thus, Term::Kaka was born to make Term::Caca
 be, sound, and smell harsh.
 
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
 =cut
+
+
+__END__
+
 
 # $Id: Kaka.pm,v 1.2 2004/10/22 21:12:01 beppu Exp $
