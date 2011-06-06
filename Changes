@@ -1,6 +1,7 @@
 Revision history for Term::Caca
 
 {{$NEXT}}
+  * upgrade to API 1.x of libcaca
   * add maze.pl example
   * remove script caca-sprite
 

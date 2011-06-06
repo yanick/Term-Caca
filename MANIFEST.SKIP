@@ -1,3 +1,4 @@
+\.build
 dist\.ini
 MANIFEST\.SKIP
 ^Term-Caca-\d
