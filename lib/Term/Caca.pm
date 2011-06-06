@@ -24,10 +24,59 @@ use Term::Caca::Event::Mouse::Button::Release;
 use Term::Caca::Event::Resize;
 use Term::Caca::Event::Quit;
 
+=head1 SYNOPSIS
+
+  use Term::Caca;
+
+  my $caca = Term::Caca->new;
+  $caca->text( [5, 5], "pwn3d");
+  $caca->refresh;
+  sleep 3;
+
+=head1 DESCRIPTION
+
+C<Term::Caca> is an API for the ASCII drawing library I<libcaca>.
+
+This version of C<Term::Caca> is compatible with the I<1.x> version of 
+the libcaca library (development has been made against version 
+0.99.beta17 of the library).
+
 # exports
+
+=head1 EXPORTS
+
+    use Term::Caca qw/ :all /;          # import all 
+    # or
+    use Term::Caca qw/ :colors /;       # import specific group 
+    # or
+    use Term::Caca qw/ $LIGHTRED /;     # import specific constant 
+
+
+=cut
 
 our @EXPORT_OK;
 our %EXPORT_TAGS;
+
+=head2 COLORS
+
+    use Term::Caca qw/ :colors /;           # import all colors
+    # or 
+    use Term::Caca qw/ $WHITE $LIGHTRED /;  # import specific colors
+    # or 
+    use Term::Caca qw/ %COLORS /;           # import colors as a hash
+    # or
+    print $Term::Caca::COLORS{WHITE}        # use original array directly
+
+The color constants used by C<set_ansi_color()>. The available colors are
+
+  BLACK       BLUE        GREEN       CYAN          RED                 
+  MAGENTA     BROWN       LIGHTGRAY   DARKGRAY      LIGHTBLUE           
+  LIGHTGREEN  LIGHTCYAN   LIGHTRED    LIGHTMAGENTA  YELLOW              
+  WHITE       DEFAULT     TRANSPARENT         
+
+
+=cut
+
 
 const our %COLORS => (
   BLACK              => 0,
@@ -72,6 +121,27 @@ const our $TRANSPARENT        => 32;
 $EXPORT_TAGS{colors} = [ map { '$'.$_ } keys %COLORS ];
 push @EXPORT_OK, '@COLORS', @{$EXPORT_TAGS{colors}};
 
+
+=head2 EVENTS
+
+    use Term::Caca qw/ :events /;                 # import all events
+    # or 
+    use Term::Caca qw/ $NO_EVENT $KEY_RELEASE /;  # import specific events
+    # or 
+    use Term::Caca qw/ %EVENTS /;                 # import events as a hash
+    # or
+    print $Term::Caca::EVENTS{MOUSE_PRESS}        # use original array directly
+
+The event constants used by the mask of C<wait_for_event()>. The available
+events are
+
+    NO_EVENT    ANY_EVENT
+    KEY_PRESS   KEY_RELEASE
+    MOUSE_PRESS MOUSE_RELEASE   MOUSE_MOTION
+    RESIZE      QUIT
+
+=cut
+
 const our %EVENTS => (
     NO_EVENT =>          0x0000,
     KEY_PRESS =>     0x0001,
@@ -99,10 +169,13 @@ push @EXPORT_OK, '@EVENTS', @{$EXPORT_TAGS{events}};
 
 push @{$EXPORT_TAGS{all}}, uniq map { @$_ } values %EXPORT_TAGS;
 
-=method new
+=head1 METHODS
 
-This method instantiates a Term::Caca object.  (Note that init() is an alias for new()
-and that they may be used interchangeably.)
+=head2 Constructor
+
+=head3 new
+
+Instantiates a Term::Caca object. 
 
 =cut
 
@@ -125,7 +198,9 @@ method canvas {
     return $self->{canvas};
 }
 
-=method set_title( $title )
+=head2 Display and Canvas
+
+=head3 set_title( $title )
 
 Sets the window title to I<$title>. 
 
@@ -139,8 +214,20 @@ method set_title ( $title ) {
   return $self;
 }
 
+=head3 refresh
 
-=method set_refresh_delay( $seconds )
+Refreshes the display.
+
+Returns the invocant I<Term::Caca> object.
+
+=cut
+
+method refresh {
+  _refresh($self->display);
+  return $self;
+}
+
+=head3 set_refresh_delay( $seconds )
 
 Sets the refresh delay in seconds. The refresh delay is used by                                                                
 C<refresh> to achieve constant framerate.
@@ -157,7 +244,7 @@ method set_refresh_delay ( $seconds ) {
   return $self;
 }
 
-=method rendering_time()
+=head3 rendering_time()
 
 Returns the average rendering time, which is measured as the time between
 two C<refresh()> calls, in seconds. If constant framerate is enabled via
@@ -170,7 +257,86 @@ method rendering_time {
   return _get_delay($self->display)/1_000_000;
 }
 
-=method set_ansi_color( $foreground, $background )
+=head3 clear()
+
+Clears the canvas using the current background color.
+
+Returns the invocant object.
+
+=cut
+
+method clear () {
+  _clear($self->canvas);
+  return $self;
+}
+
+=head3 canvas_size
+
+Returns the width and height of the canvas,
+as a list in an array context, as a array ref
+in a scalar context.
+
+=cut
+
+method canvas_size {
+    my @d = ( $self->canvas_width, $self->canvas_height );
+
+    return wantarray ? @d : \@d;
+}
+
+=head2 canvas_width
+
+Returns the canvas width.
+
+=cut
+
+method canvas_width {
+  return _get_width($self->canvas);
+}
+
+=head3 canvas_height
+
+Returns the canvas height.
+
+=cut
+
+method canvas_height {
+  return _get_height($self->canvas);
+}
+
+=head3 mouse_position 
+
+Returns the position of the mouse. In a list context, returns
+the I<x>, I<y> coordinates, in a scalar context returns them as an
+array ref.
+
+This function is not reliable if the ncurses or S-Lang                                                            
+drivers are being used, because mouse position is only detected when                                                               
+the mouse is clicked. Other drivers such as X11 work well.
+
+=cut
+
+
+method mouse_position {
+    my @pos = ( _get_mouse_x( $self->display ), _get_mouse_y( $self->display ) );
+    return wantarray ? @pos : \@pos;
+}
+
+#
+sub get_mouse_x {
+# my ($self) = @_;
+  return _get_mouse_x();
+}
+
+#
+sub get_mouse_y {
+# my ($self) = @_;
+  return _get_mouse_y();
+}
+
+=head2 Colors
+
+=head3 set_ansi_color( $foreground, $background )
 
 Sets the foreground and background colors used by primitives,
 using colors as defined by C<%COLORS>.
@@ -188,7 +354,7 @@ method set_ansi_color( $foreground, $background ) {
     return $self;
 }
 
-=method set_color( $foreground, $background ) 
+=head3 set_color( $foreground, $background ) 
 
 Sets the foreground and background colors used by primitives. 
 
@@ -244,197 +410,14 @@ sub get_feature_name {
   return _get_feature_name($feature);
 }
 
-
-=head3 get_rendertime
-
-Returns the average rendering time, which is the average measured time
-between two C<refresh()> calls, in microseconds.
-
-If constant
-framerate was activated by calling C<set_delay()>, the average
-rendering time will be close to the requested delay even if the real
-rendering time was shorter.
-
-=cut
-
-sub get_rendertime {
-  return _get_rendertime();
-}
-
-=method canvas_size
-
-Returns the width and height of the canvas,
-as a list in an array context, as a array ref
-in a scalar context.
-
-=cut
-
-method canvas_size {
-    my @d = ( $self->canvas_width, $self->canvas_height );
-
-    return wantarray ? @d : \@d;
-}
-
-=method canvas_width
-
-Returns the canvas width.
-
-=cut
-
-method canvas_width {
-  return _get_width($self->canvas);
-}
-
-=head3 canvas_height
-
-Returns the canvas height.
-
-=cut
-
-method canvas_height {
-  return _get_height($self->canvas);
-}
-
-=head3 set_window_title( $title )
-
-Sets the window title to I<$title>. 
-
-Returns the invocant I<Term::Caca> object.
-
-=cut
-
-sub set_window_title {
-  my ($self, $title) = @_;
-  $title ||= "";
-
-  my $result = _set_window_title($title);
-
-  return $self;
-}
-
-#
-sub get_window_width {
-# my ($self) = @_;
-  return _get_window_width();
-}
-
-#
-sub get_window_height {
-# my ($self) = @_;
-  return _get_window_height();
-}
-
-
-=head3 refresh
-
-Refreshes the display.
-
-Returns the invocant I<Term::Caca> object.
-
-=cut
-
-method refresh {
-  _refresh($self->display);
-  return $self;
-}
-
 sub DESTROY {
     my $self = shift;
   _free_display( $self->{display} ) if $self->{display};
 }
 
-# Event handling
+=head2 Text
 
-#
-method wait_for_event ( :$mask = $ANY_EVENT, :$timeout = 0 ) {
-  my $event = _get_event( $self->display, $mask, $timeout, defined wantarray )
-      or return;
-
-  given ( _get_event_type( $event ) ) {
-    when ( $KEY_PRESS ) {
-        return Term::Caca::Event::Key::Press->new( event => $event );
-    }
-    when ( $KEY_RELEASE ) {
-        return Term::Caca::Event::Key::Release->new( event => $event );
-    }
-    when ( $MOUSE_MOTION ) {
-        return Term::Caca::Event::Mouse::Motion->new( event => $event );
-    }
-    when ( $MOUSE_PRESS ) {
-        return Term::Caca::Event::Mouse::Button::Press->new( event => $event );
-    }
-    when ( $MOUSE_RELEASE ) {
-        return Term::Caca::Event::Mouse::Button::Release->new( event => $event );
-    }
-    when ( $RESIZE ) {
-        return Term::Caca::Event::Resize->new( event => $event );
-    }
-    when ( $QUIT ) {
-        return Term::Caca::Event::Quit->new( event => $event );
-    }
-    default {
-        return;
-    }
-  }
-
-}
-
-=method mouse_position 
-
-Returns the position of the mouse. In a list context, returns
-the I<x>, I<y> coordinates, in a scalar context returns them as an
-array ref.
-
-This function is not reliable if the ncurses or S-Lang                                                            
-drivers are being used, because mouse position is only detected when                                                               
-the mouse is clicked. Other drivers such as X11 work well.
-
-=cut
-
-
-method mouse_position {
-    my @pos = ( _get_mouse_x( $self->display ), _get_mouse_y( $self->display ) );
-    return wantarray ? @pos : \@pos;
-}
-
-#
-sub get_mouse_x {
-# my ($self) = @_;
-  return _get_mouse_x();
-}
-
-#
-sub get_mouse_y {
-# my ($self) = @_;
-  return _get_mouse_y();
-}
-
-1;
-
-# Character printing
-
-#
-
-#
-sub get_fg_color {
-# my ($self) = @_;
-  return _get_fg_color();
-}
-
-#
-sub get_bg_color {
-# my ($self) = @_;
-  return _get_bg_color();
-}
-
-#
-sub get_color_name {
-  my ($self, $color) = @_;
-  return undef unless(defined($color));
-  return _get_color_name($color);
-}
-
-=method text( \@coord, $text )
+=head3 text( \@coord, $text )
 
 Prints I<$text> at the given coordinates.
 
@@ -450,7 +433,7 @@ method text ( $coord, $text ) {
     return $self;
 }
 
-=method char( \@coord, $char )
+=head3 char( \@coord, $char )
 
 Prints the character I<$char> at the given coordinates.
 If I<$char> is a string of more than one character, only
@@ -466,62 +449,10 @@ method char ( $coord, $char ) {
     return $self;
 }
 
-#
-sub putchar {
-  my ($self, $x, $y, $c) = @_;
-  $x ||= 0;
-  $y ||= 0;
-  $c ||= "";
-  _putchar($x, $y, $c);
-}
-
-#
-sub putstr {
-  my ($self, $x, $y, $s) = @_;
-  $x ||= 0;
-  $y ||= 0;
-  $s ||= "";
-  _putstr($x, $y, $s);
-}
+=head2 Primitives Drawing
 
 
-=method printf( $x, $y, $format, @args )
-
-Equivalent to 
-
-    $term->putstr( $x, $y, sprintf( $format, @args ) );
-
-B<DEPRECATED> 
-Use C<putstr()> instead.
-
-=cut
-
-# faking it by doing printf on the perl side
-sub printf {
-  deprecated();
-  my ($self, $x, $y, $s, @args) = @_;
-  $x ||= 0;
-  $y ||= 0;
-  my $string = sprintf($s, @args);
-  _putstr($x, $y, $string);
-}
-
-=method clear()
-
-Clears the canvas using the current background color.
-
-Returns the invocant object.
-
-=cut
-
-method clear () {
-  _clear($self->canvas);
-  return $self;
-}
-
-# Primitives drawing
-
-=method line( \@point_a, \@point_b, :$char = undef )
+=head3 line( \@point_a, \@point_b, :$char = undef )
 
 Draws a line from I<@point_a> to I<@point_b>
 using the character I<$char> or, if undefined,
@@ -539,7 +470,7 @@ method line ( $pa, $pb, :$char = undef ) {
     return $self;
 }
 
-=method polyline( \@points, :$char = undef , :$close = 0 ) 
+=head3 polyline( \@points, :$char = undef , :$close = 0 ) 
 
 Draws the polyline defined by I<@points>, where each point is an array ref
 of the coordinates. E.g.
@@ -566,7 +497,7 @@ method polyline( $points, :$char = undef, :$close = 0 ) {
     return $self;
 }
 
-=method circle( \@center, $radius, :$char = '*' )
+=head3 circle( \@center, $radius, :$char = '*' )
 
 Draws a circle centered at I<@center> with a radius
 of I<$radius> using the character I<$char> or, if not defined,
@@ -604,7 +535,7 @@ method circle ( $center, $radius, :$char = undef, :$fill = undef ) {
   return $self;
 }
 
-=method draw_ellipse( \@center, $radius_x, $radius_y, :$char = undef, :$fill = undef)
+=head3 ellipse( \@center, $radius_x, $radius_y, :$char = undef, :$fill = undef)
 
 Draws an ellipse centered at I<@center> with an x-axis
 radius of I<$radius_x> and a y-radius of I<$radius_y>
@@ -634,7 +565,7 @@ method ellipse ( $center, $rx, $ry, :$char = undef, :$fill = undef ) {
 }
 
 
-=method box( \@top_corner, $width, $height, :$char => undef, :$fill => undef )
+=head3 box( \@top_corner, $width, $height, :$char => undef, :$fill => undef )
 
 Draws a rectangle of dimensions I<$width> and
 I<$height> with its upper-left corner at I<@top_corner>,
@@ -665,7 +596,7 @@ method box  ( $center, $width, $height, :$char = undef, :$fill = undef ){
   return $self;
 }
 
-=method triangle( \@point_a, \@point_b, \@point_c, :$char => undef, :$fill => undef )
+=head3 triangle( \@point_a, \@point_b, \@point_c, :$char => undef, :$fill => undef )
 
 Draws a triangle defined by the three given points
 using the character I<$char> or, if not defined, ascii art. 
@@ -694,6 +625,77 @@ method triangle  ( $pa, $pb, $pc, :$char = undef, :$fill = undef ){
 
   return $self;
 }
+
+=head2  Event Handling
+
+=head3 wait_for_event( :$mask = $ANY_EVENT, :$timeout = 0 )
+
+Waits and returns a C<Term::Caca::Event> object matching the mask.
+
+C<$timeout> is in seconds. If set to 0, the method returns immediatly and,
+if no event was found, returns nothing. If C<$timeout> is negative,
+the method waits forever for an event matching the mask.
+
+    # wait for 5 seconds for a key press or the closing of the window
+    my $event = $t->wait_for_event( 
+        mask => $KEY_PRESS | $QUIT, 
+        timeout => 5 
+    );
+
+    say "user is idle" unless defined $event;
+
+    exit if $event->isa( 'Term::Caca::Event::Quit' );
+
+    say "user typed ", $event->char;
+
+=cut
+
+method wait_for_event ( :$mask = $ANY_EVENT, :$timeout = 0 ) {
+  my $event = _get_event( $self->display, $mask, int($timeout*1_000_000), defined wantarray )
+      or return;
+
+  given ( _get_event_type( $event ) ) {
+    when ( $KEY_PRESS ) {
+        return Term::Caca::Event::Key::Press->new( event => $event );
+    }
+    when ( $KEY_RELEASE ) {
+        return Term::Caca::Event::Key::Release->new( event => $event );
+    }
+    when ( $MOUSE_MOTION ) {
+        return Term::Caca::Event::Mouse::Motion->new( event => $event );
+    }
+    when ( $MOUSE_PRESS ) {
+        return Term::Caca::Event::Mouse::Button::Press->new( event => $event );
+    }
+    when ( $MOUSE_RELEASE ) {
+        return Term::Caca::Event::Mouse::Button::Release->new( event => $event );
+    }
+    when ( $RESIZE ) {
+        return Term::Caca::Event::Resize->new( event => $event );
+    }
+    when ( $QUIT ) {
+        return Term::Caca::Event::Quit->new( event => $event );
+    }
+    default {
+        return;
+    }
+  }
+
+}
+
+1;
+
+# Character printing
+
+#
+
+#
+sub get_color_name {
+  my ($self, $color) = @_;
+  return undef unless(defined($color));
+  return _get_color_name($color);
+}
+
 
 # Sprite handling
 
@@ -804,94 +806,10 @@ sub free_bitmap {
 __END__
 
 
-=head1 SYNOPSIS
-
-Usage:
-
-  use Term::Caca;
-  my $caca = Term::Caca->init();
-  $caca->putstr(5, 5, "pwn3d");
-  $caca->refresh();
-  sleep 3;
-
-=head1 DESCRIPTION
-
-=head2 Methods
-
-=head3 get_feature
-
-=head3 set_feature
-
-=head3 get_feature_name
-
-=head3 get_window_width
-
-=head3 get_window_height
-
-=head3 get_event
-
-=head3 get_mouse_x
-
-=head3 get_mouse_y
-
-=head3 wait_event
-
-=head3 get_fg_color
-
-=head3 get_bg_color
-
-=head3 get_color_name
-
-=head3 putchar
-
-=head3 putstr
-
-=head3 clear
-
-
-=method draw_polyline
-
-
-=method draw_thin_polyline
-
-=cut
-=head3 load_sprite
-
-=head3 get_sprite_frames
-
-=head3 get_sprite_width
-
-=head3 get_sprite_height
-
-=head3 get_sprite_dx
-
-=head3 get_sprite_dy
-
-=head3 draw_sprite
-
-=head3 free_sprite
-
-=head3 create_bitmap
-
-=head3 set_bitmap_palette
-
-=head3 draw_bitmap
-
-=head3 free_bitmap
-
-=head1 AUTHOR
-
-John Beppu E<lt>beppu@cpan.orgE<gt>
-
 =head1 SEE ALSO
 
-L<Term::Caca::Constants|Term::Caca::Constants>,
-L<Term::Caca::Sprite|Term::Caca::Sprite>,
-L<Term::Caca::Bitmap|Term::Caca::Bitmap>,
+libcaca - L<http://caca.zoy.org/>
 
 L<Term::Kaka|Term::Kaka>
 
 =cut
-
-# vim:sw=2 sts=2 expandtab
-# $Id: Caca.pm,v 1.5 2004/10/25 18:14:57 beppu Exp $

@@ -10,7 +10,7 @@ my $t = Term::Caca->new;
 $t->refresh;
 
 while(1) {
-    my $event = $t->wait_for_event( mask => $KEY_PRESS, timeout => -1 );
+    my $event = $t->wait_for_event( mask => $KEY_PRESS | $QUIT, timeout => -5 );
 
     say ">>> ", ref $event;
 
