@@ -112,6 +112,24 @@ c_array_32(SV *p_array_ref)
 
 MODULE = Term::Caca   PACKAGE = Term::Caca
 
+# import/export
+
+SV *
+_export( canvas, format ) 
+        void * canvas;
+        char * format;
+    CODE:
+        size_t size;
+        SV *export;
+        char *string;
+
+        string = caca_export_canvas_to_memory( canvas, format, &size );
+        export = newSVpv( string, size );
+        RETVAL = export;
+    OUTPUT:
+        RETVAL
+
+
 # -==[- Basic functions -]==--------------------------------------------------
 
 void
@@ -336,28 +354,6 @@ _set_ansi_color(canvas, fgcolor, bgcolor)
     unsigned int bgcolor;
   CODE:
     caca_set_color_ansi(canvas,fgcolor, bgcolor);
-
-unsigned int
-_get_fg_color()
-  CODE:
-    RETVAL = caca_get_fg_color();
-  OUTPUT:
-    RETVAL
-
-unsigned int
-_get_bg_color()
-  CODE:
-    RETVAL = caca_get_bg_color();
-  OUTPUT:
-    RETVAL
-
-const char *
-_get_color_name(color)
-    unsigned int color
-  CODE:
-    RETVAL = caca_get_color_name(color);
-  OUTPUT:
-    RETVAL
 
 void
 _putchar(canvas,x, y, c)
@@ -617,264 +613,3 @@ _fill_triangle(canvas, x0, y0, x1, y1, x2, y2, c)
     char c;
   CODE:
     caca_fill_triangle(canvas, x0, y0, x1, y1, x2, y2, c);
-
-# -==[- Mathematical functions -]==-------------------------------------------
-
-int
-_rand(min, max)
-    int min;
-    int max;
-  CODE:
-    RETVAL = caca_rand(min, max);
-  OUTPUT:
-    RETVAL
-
-unsigned int
-_sqrt(n)
-    unsigned int n;
-  CODE:
-    RETVAL = caca_sqrt(n);
-  OUTPUT:
-    RETVAL
-
-# -==[- Sprite handling -]==--------------------------------------------------
-
-SV *
-_load_sprite(file)
-    const char *file
-  INIT:
-    struct caca_sprite  *c_sprite;
-    HV                  *sprite;
-  CODE:
-    if (!file) {
-      XSRETURN_UNDEF;
-    }
-    c_sprite = caca_load_sprite(file);
-    if (!c_sprite) {
-      XSRETURN_UNDEF;
-    } else {
-      sprite = (HV *) sv_2mortal((SV *) newHV());
-      if (!sprite) {
-        XSRETURN_UNDEF;
-      }
-      hv_store(sprite, "__address", 9, newSViv((size_t) c_sprite), 0);
-      RETVAL = newRV((SV *) sprite);
-    }
-  OUTPUT:
-    RETVAL
-
-int
-_get_sprite_frames(sprite)
-    SV *sprite
-  INIT:
-    struct caca_sprite *c_sprite;
-    c_sprite = address_of(sprite);
-    if (!c_sprite) {
-      XSRETURN_UNDEF;
-    }
-  CODE:
-    RETVAL = caca_get_sprite_frames(c_sprite);
-  OUTPUT:
-    RETVAL
-
-int
-_get_sprite_width(sprite, f)
-    SV  *sprite;
-    int f;
-  INIT:
-    struct caca_sprite *c_sprite;
-    c_sprite = address_of(sprite);
-    if (!c_sprite) {
-      XSRETURN_UNDEF;
-    }
-  CODE:
-    RETVAL = caca_get_sprite_width(c_sprite, f);
-  OUTPUT:
-    RETVAL
-
-int
-_get_sprite_height(sprite, f)
-    SV  *sprite;
-    int f;
-  INIT:
-    struct caca_sprite *c_sprite;
-    c_sprite = address_of(sprite);
-    if (!c_sprite) {
-      XSRETURN_UNDEF;
-    }
-  CODE:
-    RETVAL = caca_get_sprite_height(c_sprite, f);
-  OUTPUT:
-    RETVAL
-
-int
-_get_sprite_dx(sprite, f)
-    SV  *sprite;
-    int f;
-  INIT:
-    struct caca_sprite *c_sprite;
-    c_sprite = address_of(sprite);
-    if (!c_sprite) {
-      XSRETURN_UNDEF;
-    }
-  CODE:
-    RETVAL = caca_get_sprite_dx(c_sprite, f);
-  OUTPUT:
-    RETVAL
-
-int
-_get_sprite_dy(sprite, f)
-    SV  *sprite;
-    int f;
-  INIT:
-    struct caca_sprite *c_sprite;
-    c_sprite = address_of(sprite);
-    if (!c_sprite) {
-      XSRETURN_UNDEF;
-    }
-  CODE:
-    RETVAL = caca_get_sprite_dy(c_sprite, f);
-  OUTPUT:
-    RETVAL
-
-void
-_draw_sprite(x, y, sprite, f)
-    int x;
-    int y;
-    SV *sprite;
-    int f;
-  INIT:
-    struct caca_sprite *c_sprite;
-    c_sprite = address_of(sprite);
-    if (!c_sprite) {
-      XSRETURN_UNDEF;
-    }
-  CODE:
-    caca_draw_sprite(x, y, c_sprite, f);
-
-void
-_free_sprite(sprite)
-    SV *sprite;
-  INIT:
-    struct caca_sprite *c_sprite;
-    c_sprite = address_of(sprite);
-    if (!c_sprite) {
-      XSRETURN_UNDEF;
-    }
-  CODE:
-    caca_free_sprite(c_sprite);
-
-# -==[- Bitmap handling -]==--------------------------------------------------
-
-void
-_set_bitmap_palette_tied(bitmap, red, green, blue, alpha)
-    SV *bitmap;
-    void *red;
-    void *green;
-    void *blue;
-    void *alpha;
-  INIT:
-    struct caca_bitmap *c_bitmap;
-
-    c_bitmap = address_of(bitmap);
-    if (!c_bitmap) {
-      XSRETURN_UNDEF;
-    }
-
-  CODE:
-    caca_set_bitmap_palette(c_bitmap, red, green, blue, alpha);
-
-void
-_set_bitmap_palette_copy(bitmap, red, green, blue, alpha)
-    SV *bitmap;
-    SV *red;
-    SV *green;
-    SV *blue;
-    SV *alpha;
-  INIT:
-    struct caca_bitmap *c_bitmap;
-    unsigned int *c_red;
-    unsigned int *c_green;
-    unsigned int *c_blue;
-    unsigned int *c_alpha;
-
-    c_bitmap = address_of(bitmap);
-    if (!c_bitmap) {
-      XSRETURN_UNDEF;
-    }
-
-    c_red   = (unsigned int *) c_array_32(red);
-    c_green = (unsigned int *) c_array_32(green);
-    c_blue  = (unsigned int *) c_array_32(blue);
-    c_alpha = (unsigned int *) c_array_32(alpha);
-  CODE:
-    caca_set_bitmap_palette(c_bitmap, c_red, c_green, c_blue, c_alpha);
-    free(c_red);
-    free(c_green);
-    free(c_blue);
-    free(c_alpha);
-
-void
-_draw_bitmap_tied(x1, y1, x2, y2, bitmap, pixels)
-    int x1;
-    int y1;
-    int x2;
-    int y2;
-    SV *bitmap;
-    void *pixels;
-  INIT:
-    struct caca_bitmap *c_bitmap;
-
-    c_bitmap = address_of(bitmap);
-  CODE:
-    caca_draw_bitmap(x1, y1, x2, y2, c_bitmap, pixels);
-
-void
-_draw_bitmap_copy(x1, y1, x2, y2, bitmap, pixels)
-    int x1;
-    int y1;
-    int x2;
-    int y2;
-    SV *bitmap;
-    SV *pixels;
-  INIT:
-    struct caca_bitmap *c_bitmap;
-    void *c_pixels;
-    int bpp;
-
-    c_bitmap = address_of(bitmap);
-    bpp = hashref_lookup(bitmap, "__bpp");
-    switch (bpp) {
-      case  8:
-        c_pixels = c_array_8(pixels);
-        break;
-      case 16:
-        c_pixels = c_array_16(pixels);
-        break;
-      case 24:
-        c_pixels = c_array_8(pixels);
-        break;
-      case 32:
-        c_pixels = c_array_32(pixels);
-        break;
-      default:
-        XSRETURN_UNDEF;
-        break;
-    }
-  CODE:
-    caca_draw_bitmap(x1, y1, x2, y2, c_bitmap, c_pixels);
-    free(c_pixels);
-
-void
-_free_bitmap(bitmap)
-    SV *bitmap;
-  INIT:
-    struct caca_bitmap *c_bitmap;
-    c_bitmap = address_of(bitmap);
-    if (!c_bitmap) {
-      XSRETURN_UNDEF;
-    }
-  CODE:
-    caca_free_bitmap(c_bitmap);
-
-# vim:sw=2 sts=2 expandtab

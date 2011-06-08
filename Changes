@@ -1,6 +1,9 @@
 Revision history for Term::Caca
 
 {{$NEXT}}
+  * strip leftover 0.x stuff from Caca.pm and Caca.xs
+
+1.0_0     2011-06-05
   * upgrade to API 1.x of libcaca
   * add maze.pl example
   * remove script caca-sprite
