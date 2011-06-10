@@ -112,6 +112,24 @@ c_array_32(SV *p_array_ref)
 
 MODULE = Term::Caca   PACKAGE = Term::Caca
 
+# import/export
+
+SV *
+_export( canvas, format ) 
+        void * canvas;
+        char * format;
+    CODE:
+        size_t size;
+        SV *export;
+        char *string;
+
+        string = caca_export_canvas_to_memory( canvas, format, &size );
+        export = newSVpv( string, size );
+        RETVAL = export;
+    OUTPUT:
+        RETVAL
+
+
 # -==[- Basic functions -]==--------------------------------------------------
 
 void

@@ -6,12 +6,13 @@ use strict;
 use warnings;
 no warnings qw/ uninitialized /;
 
-our $VERSION = '1.0_0';
+our $VERSION = '1.0_1';
 
 use parent qw/ Exporter DynaLoader /;
 
 Term::Caca->bootstrap($VERSION);
 
+use Carp;
 use Method::Signatures;
 use Const::Fast;
 use List::MoreUtils qw/ uniq /;
@@ -334,6 +335,73 @@ sub get_mouse_y {
   return _get_mouse_y();
 }
 
+=head2 Import/Export
+
+=head3 import( $drawing, :$format => 'auto' )
+
+Imports the drawing. The supported formats are
+
+=over
+
+=item "auto": try to guess the format.
+
+=item  "caca": native libcaca files.
+
+=item  "ansi": ANSI art (CP437 charset with ANSI colour codes).
+
+=item  "text": ASCII text file.
+
+=item  "utf8": UTF-8 text with ANSI color codes.
+
+=back
+
+=cut
+
+# TODO: troff seems to trigger a segfault
+my @export_formats = qw/ caca ansi text html html3 irc ps svg tga /;
+
+=head3 export( :$format = 'caca' )
+
+Returns the canvas in the given format.
+
+Supported formats are
+
+=over
+
+=item  "caca": native libcaca files.
+
+=item  "ansi": ANSI art (CP437 charset with ANSI colour codes).
+
+=item  "text": ASCII text file.
+
+=item  "html": an HTML page with CSS information.
+
+=item  "html3": an HTML table that should be compatible with most navigators, including textmode ones.
+
+=item  "irc": UTF-8 text with mIRC colour codes.
+
+=item  "ps": a PostScript document.
+
+=item  "svg": an SVG vector image.
+
+=item  "tga": a TGA image.
+
+=back
+
+=cut
+
+method export( :$format = 'caca' ) {
+
+    croak "format '$format' not supported" unless $format ~~ @export_formats;
+
+    my $export = _export( $self->canvas, $format eq 'text' ? 'ansi' : $format );
+
+    $export =~ s/\e\[?.*?[\@-~]//g if $format eq 'text';
+    
+    return $export;
+}
+
+
 =head2 Colors
 
 =head3 set_ansi_color( $foreground, $background )
@@ -497,7 +565,7 @@ method polyline( $points, :$char = undef, :$close = 0 ) {
     return $self;
 }
 
-=head3 circle( \@center, $radius, :$char = '*' )
+=head3 circle( \@center, $radius, :$char = '*', :$fill = undef )
 
 Draws a circle centered at I<@center> with a radius
 of I<$radius> using the character I<$char> or, if not defined,
