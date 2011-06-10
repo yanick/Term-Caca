@@ -9,12 +9,13 @@ use strict;
 use warnings;
 no warnings qw/ uninitialized /;
 
-our $VERSION = '1.0_0';
+our $VERSION = '1.0_1';
 
 use parent qw/ Exporter DynaLoader /;
 
 Term::Caca->bootstrap($VERSION);
 
+use Carp;
 use Method::Signatures;
 use Const::Fast;
 use List::MoreUtils qw/ uniq /;
@@ -190,6 +191,23 @@ sub get_mouse_y {
 # my ($self) = @_;
   return _get_mouse_y();
 }
+
+
+# TODO: troff seems to trigger a segfault
+my @export_formats = qw/ caca ansi text html html3 irc ps svg tga /;
+
+
+method export( :$format = 'caca' ) {
+
+    croak "format '$format' not supported" unless $format ~~ @export_formats;
+
+    my $export = _export( $self->canvas, $format eq 'text' ? 'ansi' : $format );
+
+    $export =~ s/\e\[?.*?[\@-~]//g if $format eq 'text';
+    
+    return $export;
+}
+
 
 
 
@@ -394,124 +412,6 @@ method wait_for_event ( :$mask = $ANY_EVENT, :$timeout = 0 ) {
 
 }
 
-1;
-
-# Character printing
-
-#
-
-#
-sub get_color_name {
-  my ($self, $color) = @_;
-  return undef unless(defined($color));
-  return _get_color_name($color);
-}
-
-
-# Sprite handling
-
-#
-sub load_sprite {
-  my ($self, $file) = @_;
-  my $sprite = _load_sprite($file);
-  return $sprite;
-}
-
-#
-sub get_sprite_frames {
-  my ($self, $sprite) = @_;
-  return _get_sprite_frames($sprite);
-}
-
-#
-sub get_sprite_width {
-  my ($self, $sprite) = @_;
-  return _get_sprite_width($sprite);
-}
-
-#
-sub get_sprite_height {
-  my ($self, $sprite) = @_;
-  return _get_sprite_height($sprite);
-}
-
-#
-sub get_sprite_dx {
-  my ($self, $sprite) = @_;
-  return _get_sprite_dx($sprite);
-}
-
-#
-sub get_sprite_dy {
-  my ($self, $sprite) = @_;
-  return _get_sprite_dy($sprite);
-}
-
-#
-sub draw_sprite {
-  my ($self, $x, $y, $sprite, $f) = @_;
-  _draw_sprite($x, $y, $sprite, $f);
-}
-
-#
-sub free_sprite {
-  my ($self, $sprite) = @_;
-  _free_sprite($sprite);
-}
-
-# Bitmap handling
-
-#
-sub create_bitmap {
-  my ($self, $bpp, $w, $h, $pitch, $rmask, $gmask, $bmask, $amask) = @_;
-  my $bitmap = _create_bitmap($bpp, $w, $h, $pitch, $rmask, $gmask, $bmask, $amask);
-  return $bitmap;
-}
-
-#
-sub set_bitmap_palette {
-  my ($self, $bitmap, $red, $green, $blue, $alpha) = @_;
-  if (
-    4 == (
-      grep { tied($_) && tied($_)->can('address') }
-        ($red, $green, $blue, $alpha)
-    )
-    )
-  {
-    # If a tied arrayrefs that support the addess() method are sent,
-    # we use the address of the array.
-    _set_bitmap_palette_tied(
-      $bitmap,
-      tied($red)->address,
-      tied($green)->address,
-      tied($blue)->address,
-      tied($alpha)->address
-    );
-  } else {
-    # Otherwise, the arrayref will be copied into a C array before
-    # handing it off to the C function, caca_set_bitmap_palette()
-    _set_bitmap_palette_copy($bitmap, $red, $green, $blue, $alpha);
-  }
-}
-
-#
-sub draw_bitmap {
-  my ($self, $x1, $y1, $x2, $y2, $bitmap, $pixels) = @_;
-  if (tied($pixels) && tied($pixels)->can('address')) {
-    # If a tied arrayref that supports the addess() method is sent,
-    # we use the address of the array.
-    _draw_bitmap_tied($x1, $y1, $x2, $y2, $bitmap, tied($pixels)->address);
-  } else {
-    # Otherwise, the arrayref will be copied into a C array before
-    # handing it off to the C function, caca_draw_bitmap()
-    _draw_bitmap_copy($x1, $y1, $x2, $y2, $bitmap, $pixels);
-  }
-}
-
-sub free_bitmap {
-  my ($self, $bitmap) = @_;
-  _free_bitmap($bitmap);
-}
 'end of Term::Caca';
 
 
@@ -524,7 +424,7 @@ Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 =head1 VERSION
 
-version 1.0_0
+version 1.0_1
 
 =head1 SYNOPSIS
 
@@ -657,6 +557,54 @@ This function is not reliable if the ncurses or S-Lang
 drivers are being used, because mouse position is only detected when                                                               
 the mouse is clicked. Other drivers such as X11 work well.
 
+=head2 Import/Export
+
+=head3 import( $drawing, :$format => 'auto' )
+
+Imports the drawing. The supported formats are
+
+=over
+
+=item "auto": try to guess the format.
+
+=item "caca": native libcaca files.
+
+=item "ansi": ANSI art (CP437 charset with ANSI colour codes).
+
+=item "text": ASCII text file.
+
+=item "utf8": UTF-8 text with ANSI color codes.
+
+=back
+
+=head3 export( :$format = 'caca' )
+
+Returns the canvas in the given format.
+
+Supported formats are
+
+=over
+
+=item "caca": native libcaca files.
+
+=item "ansi": ANSI art (CP437 charset with ANSI colour codes).
+
+=item "text": ASCII text file.
+
+=item "html": an HTML page with CSS information.
+
+=item "html3": an HTML table that should be compatible with most navigators, including textmode ones.
+
+=item "irc": UTF-8 text with mIRC colour codes.
+
+=item "ps": a PostScript document.
+
+=item "svg": an SVG vector image.
+
+=item "tga": a TGA image.
+
+=back
+
 =head2 Colors
 
 =head3 set_ansi_color( $foreground, $background )
@@ -721,7 +669,7 @@ be connected to the first point.
 
 Returns the invocant I<Term::Caca> object.
 
-=head3 circle( \@center, $radius, :$char = '*' )
+=head3 circle( \@center, $radius, :$char = '*', :$fill = undef )
 
 Draws a circle centered at I<@center> with a radius
 of I<$radius> using the character I<$char> or, if not defined,

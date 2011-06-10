@@ -3,7 +3,7 @@ BEGIN {
   $Term::Kaka::AUTHORITY = 'cpan:yanick';
 }
 BEGIN {
-  $Term::Kaka::VERSION = '1.0_0';
+  $Term::Kaka::VERSION = '1.0_1';
 }
 #ABSTRACT: a subclass of Term::Caca with virtually identical behavior
 
@@ -21,7 +21,7 @@ Term::Kaka - a subclass of Term::Caca with virtually identical behavior
 
 =head1 VERSION
 
-version 1.0_0
+version 1.0_1
 
 =head1 SYNOPSIS
 

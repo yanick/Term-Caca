@@ -7,7 +7,6 @@ use lib 'inc'; use MyBuild;
 
 my %module_build_args = (
   'build_requires' => {
-    'Carp' => '0',
     'Module::Build' => '0.3601',
     'Scalar::Util' => '0',
     'Test::More' => '0.94'
@@ -21,12 +20,13 @@ my %module_build_args = (
     'Yanick Champoux <yanick@cpan.org>'
   ],
   'dist_name' => 'Term-Caca',
-  'dist_version' => '1.0_0',
+  'dist_version' => '1.0_1',
   'license' => 'unrestricted',
   'module_name' => 'Term::Caca',
   'recommends' => {},
   'recursive_test_files' => 1,
   'requires' => {
+    'Carp' => '0',
     'Const::Fast' => '0',
     'DynaLoader' => '0',
     'Exporter' => '0',

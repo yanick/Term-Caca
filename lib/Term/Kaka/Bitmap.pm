@@ -3,7 +3,7 @@ BEGIN {
   $Term::Kaka::Bitmap::AUTHORITY = 'cpan:yanick';
 }
 BEGIN {
-  $Term::Kaka::Bitmap::VERSION = '1.0_0';
+  $Term::Kaka::Bitmap::VERSION = '1.0_1';
 }
 #ABSTRACT: Term::Caca::Bitmap
 
@@ -21,7 +21,7 @@ Term::Kaka::Bitmap - Term::Caca::Bitmap
 
 =head1 VERSION
 
-version 1.0_0
+version 1.0_1
 
 =head1 AUTHORS
 

@@ -27,6 +27,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : 0,
             "Const::Fast" : 0,
             "DynaLoader" : 0,
             "Exporter" : 0,
@@ -40,7 +41,6 @@
       },
       "test" : {
          "requires" : {
-            "Carp" : 0,
             "Scalar::Util" : 0,
             "Test::More" : "0.94"
          }
@@ -49,75 +49,75 @@
    "provides" : {
       "Term::Caca" : {
          "file" : "lib/Term/Caca.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Bitmap" : {
          "file" : "lib/Term/Caca/Bitmap.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Constants" : {
          "file" : "lib/Term/Caca/Constants.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Event" : {
          "file" : "lib/Term/Caca/Event.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Event::Key" : {
          "file" : "lib/Term/Caca/Event/Key.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Event::Key::Press" : {
          "file" : "lib/Term/Caca/Event/Key/Press.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Event::Key::Release" : {
          "file" : "lib/Term/Caca/Event/Key/Release.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Event::Mouse::Button" : {
          "file" : "lib/Term/Caca/Event/Mouse/Button.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Event::Mouse::Button::Press" : {
          "file" : "lib/Term/Caca/Event/Mouse/Button/Press.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Event::Mouse::Button::Release" : {
          "file" : "lib/Term/Caca/Event/Mouse/Button/Release.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Event::Mouse::Motion" : {
          "file" : "lib/Term/Caca/Event/Mouse/Motion.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Event::Quit" : {
          "file" : "lib/Term/Caca/Event/Quit.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Event::Resize" : {
          "file" : "lib/Term/Caca/Event/Resize.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Caca::Sprite" : {
          "file" : "lib/Term/Caca/Sprite.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Kaka" : {
          "file" : "lib/Term/Kaka.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Kaka::Bitmap" : {
          "file" : "lib/Term/Kaka/Bitmap.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Kaka::Constants" : {
          "file" : "lib/Term/Kaka/Constants.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       },
       "Term::Kaka::Sprite" : {
          "file" : "lib/Term/Kaka/Sprite.pm",
-         "version" : "1.0_0"
+         "version" : "1.0_1"
       }
    },
    "release_status" : "testing",
@@ -133,7 +133,7 @@
          "web" : "http://github.com/yanick/Term-Caca/tree"
       }
    },
-   "version" : "1.0_0",
+   "version" : "1.0_1",
    "x_authority" : "cpan:yanick"
 }
 

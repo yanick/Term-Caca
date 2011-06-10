@@ -4,7 +4,7 @@ Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 # VERSION
 
-version 1.0_0
+version 1.0_1
 
 # SYNOPSIS
 
@@ -137,6 +137,46 @@ This function is not reliable if the ncurses or S-Lang
 drivers are being used, because mouse position is only detected when                                                               
 the mouse is clicked. Other drivers such as X11 work well.
 
+## Import/Export
+
+### import( $drawing, :$format => 'auto' )
+
+Imports the drawing. The supported formats are
+
+- "auto": try to guess the format.
+
+- "caca": native libcaca files.
+
+- "ansi": ANSI art (CP437 charset with ANSI colour codes).
+
+- "text": ASCII text file.
+
+- "utf8": UTF-8 text with ANSI color codes.
+
+### export( :$format = 'caca' )
+
+Returns the canvas in the given format.
+
+Supported formats are
+
+- "caca": native libcaca files.
+
+- "ansi": ANSI art (CP437 charset with ANSI colour codes).
+
+- "text": ASCII text file.
+
+- "html": an HTML page with CSS information.
+
+- "html3": an HTML table that should be compatible with most navigators, including textmode ones.
+
+- "irc": UTF-8 text with mIRC colour codes.
+
+- "ps": a PostScript document.
+
+- "svg": an SVG vector image.
+
+- "tga": a TGA image.
+
 ## Colors
 
 ### set_ansi_color( $foreground, $background )
@@ -201,7 +241,7 @@ be connected to the first point.
 
 Returns the invocant _Term::Caca_ object.
 
-### circle( \@center, $radius, :$char = '*' )
+### circle( \@center, $radius, :$char = '*', :$fill = undef )
 
 Draws a circle centered at _@center_ with a radius
 of _$radius_ using the character _$char_ or, if not defined,

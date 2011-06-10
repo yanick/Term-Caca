@@ -3,7 +3,7 @@ BEGIN {
   $Term::Caca::Event::Quit::AUTHORITY = 'cpan:yanick';
 }
 BEGIN {
-  $Term::Caca::Event::Quit::VERSION = '1.0_0';
+  $Term::Caca::Event::Quit::VERSION = '1.0_1';
 }
 
 use strict;
@@ -29,7 +29,7 @@ Term::Caca::Event::Quit
 
 =head1 VERSION
 
-version 1.0_0
+version 1.0_1
 
 =head1 AUTHORS
 

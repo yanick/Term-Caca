@@ -3,7 +3,7 @@ BEGIN {
   $Term::Caca::Event::Key::Release::AUTHORITY = 'cpan:yanick';
 }
 BEGIN {
-  $Term::Caca::Event::Key::Release::VERSION = '1.0_0';
+  $Term::Caca::Event::Key::Release::VERSION = '1.0_1';
 }
 # abstract: event triggered by a key release
 
@@ -30,7 +30,7 @@ Term::Caca::Event::Key::Release
 
 =head1 VERSION
 
-version 1.0_0
+version 1.0_1
 
 =head1 AUTHORS
 

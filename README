@@ -2,7 +2,7 @@ NAME
     Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 VERSION
-    version 1.0_0
+    version 1.0_1
 
 SYNOPSIS
       use Term::Caca;
@@ -116,6 +116,32 @@ METHODS
     used, because mouse position is only detected when the mouse is clicked.
     Other drivers such as X11 work well.
 
+  Import/Export
+   import( $drawing, :$format => 'auto' )
+    Imports the drawing. The supported formats are
+
+    "auto": try to guess the format.
+    "caca": native libcaca files.
+    "ansi": ANSI art (CP437 charset with ANSI colour codes).
+    "text": ASCII text file.
+    "utf8": UTF-8 text with ANSI color codes.
+
+   export( :$format = 'caca' )
+    Returns the canvas in the given format.
+
+    Supported formats are
+
+    "caca": native libcaca files.
+    "ansi": ANSI art (CP437 charset with ANSI colour codes).
+    "text": ASCII text file.
+    "html": an HTML page with CSS information.
+    "html3": an HTML table that should be compatible with most navigators,
+    including textmode ones.
+    "irc": UTF-8 text with mIRC colour codes.
+    "ps": a PostScript document.
+    "svg": an SVG vector image.
+    "tga": a TGA image.
+
   Colors
    set_ansi_color( $foreground, $background )
     Sets the foreground and background colors used by primitives, using
@@ -169,7 +195,7 @@ METHODS
 
     Returns the invocant *Term::Caca* object.
 
-   circle( \@center, $radius, :$char = '*' )
+   circle( \@center, $radius, :$char = '*', :$fill = undef )
     Draws a circle centered at *@center* with a radius of *$radius* using
     the character *$char* or, if not defined, ascii art. if *$fill* is set
     to true, the circle is filled with *$char* as well.

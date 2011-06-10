@@ -3,7 +3,7 @@ BEGIN {
   $Term::Caca::Bitmap::AUTHORITY = 'cpan:yanick';
 }
 BEGIN {
-  $Term::Caca::Bitmap::VERSION = '1.0_0';
+  $Term::Caca::Bitmap::VERSION = '1.0_1';
 }
 #ABSTRACT: an OO-interface to caca_bitmap
 
@@ -44,7 +44,7 @@ Term::Caca::Bitmap - an OO-interface to caca_bitmap
 
 =head1 VERSION
 
-version 1.0_0
+version 1.0_1
 
 =head1 SYNOPSIS
 

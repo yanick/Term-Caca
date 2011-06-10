@@ -3,7 +3,7 @@ BEGIN {
   $Term::Kaka::Sprite::AUTHORITY = 'cpan:yanick';
 }
 BEGIN {
-  $Term::Kaka::Sprite::VERSION = '1.0_0';
+  $Term::Kaka::Sprite::VERSION = '1.0_1';
 }
 #ABSTRACT:  Term::Caca::Sprite
 
@@ -21,7 +21,7 @@ Term::Kaka::Sprite - Term::Caca::Sprite
 
 =head1 VERSION
 
-version 1.0_0
+version 1.0_1
 
 =head1 AUTHORS
 

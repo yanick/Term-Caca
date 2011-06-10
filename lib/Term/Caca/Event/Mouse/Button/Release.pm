@@ -3,7 +3,7 @@ BEGIN {
   $Term::Caca::Event::Mouse::Button::Release::AUTHORITY = 'cpan:yanick';
 }
 BEGIN {
-  $Term::Caca::Event::Mouse::Button::Release::VERSION = '1.0_0';
+  $Term::Caca::Event::Mouse::Button::Release::VERSION = '1.0_1';
 }
 
 use strict;
@@ -32,7 +32,7 @@ Term::Caca::Event::Mouse::Button::Release
 
 =head1 VERSION
 
-version 1.0_0
+version 1.0_1
 
 =head1 AUTHORS
 
