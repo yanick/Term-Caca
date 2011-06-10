@@ -1,6 +1,8 @@
 Revision history for Term::Caca
 
 {{$NEXT}}
+
+1.0_1     2011-06-09
     [ENHANCEMENTS]  
         * add export() method
 
