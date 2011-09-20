@@ -1,4 +1,12 @@
 package Term::Caca::Event;
+# ABSTRACT: base class for Term::Caca events
+
+=head1 DESCRIPTION
+
+This class is inherited by the C<Term::Caca::Event::*>
+classes, and shouldn't be used directly.
+
+=cut
 
 use strict;
 use warnings;
