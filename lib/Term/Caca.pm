@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings qw/ uninitialized /;
 
-our $VERSION = '1.0_1';
+our $VERSION = '1.1.0';
 
 use parent qw/ Exporter DynaLoader /;
 
