@@ -1,10 +1,12 @@
 package Term::Caca::Event;
 BEGIN {
-  $Term::Caca::Event::AUTHORITY = 'cpan:yanick';
+  $Term::Caca::Event::AUTHORITY = 'cpan:YANICK';
 }
-BEGIN {
-  $Term::Caca::Event::VERSION = '1.0_1';
+{
+  $Term::Caca::Event::VERSION = '1.1.0';
 }
+# ABSTRACT: base class for Term::Caca events
+
 
 use strict;
 use warnings;
@@ -38,11 +40,16 @@ __END__
 
 =head1 NAME
 
-Term::Caca::Event
+Term::Caca::Event - base class for Term::Caca events
 
 =head1 VERSION
 
-version 1.0_1
+version 1.1.0
+
+=head1 DESCRIPTION
+
+This class is inherited by the C<Term::Caca::Event::*>
+classes, and shouldn't be used directly.
 
 =head1 AUTHORS
 

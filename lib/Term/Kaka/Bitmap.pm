@@ -1,9 +1,9 @@
 package Term::Kaka::Bitmap;
 BEGIN {
-  $Term::Kaka::Bitmap::AUTHORITY = 'cpan:yanick';
+  $Term::Kaka::Bitmap::AUTHORITY = 'cpan:YANICK';
 }
-BEGIN {
-  $Term::Kaka::Bitmap::VERSION = '1.0_1';
+{
+  $Term::Kaka::Bitmap::VERSION = '1.1.0';
 }
 #ABSTRACT: Term::Caca::Bitmap
 
@@ -21,7 +21,7 @@ Term::Kaka::Bitmap - Term::Caca::Bitmap
 
 =head1 VERSION
 
-version 1.0_1
+version 1.1.0
 
 =head1 AUTHORS
 

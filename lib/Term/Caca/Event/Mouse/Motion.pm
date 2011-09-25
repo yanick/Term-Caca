@@ -1,9 +1,9 @@
 package Term::Caca::Event::Mouse::Motion;
 BEGIN {
-  $Term::Caca::Event::Mouse::Motion::AUTHORITY = 'cpan:yanick';
+  $Term::Caca::Event::Mouse::Motion::AUTHORITY = 'cpan:YANICK';
 }
-BEGIN {
-  $Term::Caca::Event::Mouse::Motion::VERSION = '1.0_1';
+{
+  $Term::Caca::Event::Mouse::Motion::VERSION = '1.1.0';
 }
 
 use strict;
@@ -41,7 +41,7 @@ Term::Caca::Event::Mouse::Motion
 
 =head1 VERSION
 
-version 1.0_1
+version 1.1.0
 
 =head1 AUTHORS
 

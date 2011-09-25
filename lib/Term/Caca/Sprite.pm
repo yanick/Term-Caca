@@ -1,9 +1,9 @@
 package Term::Caca::Sprite;
 BEGIN {
-  $Term::Caca::Sprite::AUTHORITY = 'cpan:yanick';
+  $Term::Caca::Sprite::AUTHORITY = 'cpan:YANICK';
 }
-BEGIN {
-  $Term::Caca::Sprite::VERSION = '1.0_1';
+{
+  $Term::Caca::Sprite::VERSION = '1.1.0';
 }
 #ABSTRACT: an OO-interface to caca_sprite
 
@@ -66,7 +66,7 @@ Term::Caca::Sprite - an OO-interface to caca_sprite
 
 =head1 VERSION
 
-version 1.0_1
+version 1.1.0
 
 =head1 SYNOPSIS
 

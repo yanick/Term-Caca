@@ -1,11 +1,12 @@
 Revision history for Term::Caca
 
+1.1.0     2011-09-25
+    [BUG FIXES]
+        * strip leftover 0.x stuff from Caca.pm and Caca.xs
+
 1.0_1     2011-06-09
     [ENHANCEMENTS]  
         * add export() method
-
-    [BUG FIXES]
-        * strip leftover 0.x stuff from Caca.pm and Caca.xs
 
 1.0_0     2011-06-05
   * upgrade to API 1.x of libcaca

@@ -1,6 +1,6 @@
 package Term::Caca;
 BEGIN {
-  $Term::Caca::AUTHORITY = 'cpan:yanick';
+  $Term::Caca::AUTHORITY = 'cpan:YANICK';
 }
 #ABSTRACT: perl interface for libcaca (Colour AsCii Art library)
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 no warnings qw/ uninitialized /;
 
-our $VERSION = '1.0_1';
+our $VERSION = '1.1.0';
 
 use parent qw/ Exporter DynaLoader /;
 
@@ -424,7 +424,7 @@ Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 =head1 VERSION
 
-version 1.0_1
+version 1.1.0
 
 =head1 SYNOPSIS
 

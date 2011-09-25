@@ -1,11 +1,12 @@
 package Term::Caca::Event::Key::Release;
 BEGIN {
-  $Term::Caca::Event::Key::Release::AUTHORITY = 'cpan:yanick';
+  $Term::Caca::Event::Key::Release::AUTHORITY = 'cpan:YANICK';
 }
-BEGIN {
-  $Term::Caca::Event::Key::Release::VERSION = '1.0_1';
+{
+  $Term::Caca::Event::Key::Release::VERSION = '1.1.0';
 }
 # abstract: event triggered by a key release
+
 
 use strict;
 use warnings;
@@ -17,6 +18,7 @@ sub new {
     my $self = Term::Caca::Event::Key->new( @_ );
     return bless $self, $class;
 }
+
 
 1;
 
@@ -30,7 +32,34 @@ Term::Caca::Event::Key::Release
 
 =head1 VERSION
 
-version 1.0_1
+version 1.1.0
+
+=head1 SYNOPSIS
+
+    use Term::Caca qw/ :events /;
+
+    my $t = Term::Caca->new;
+    while ( 1 ) {
+        my $event = $t->wait_for_event( 
+            mask => $KEY_RELEASE,
+        );  
+        
+        print "character typed: ", $event->char;
+    }
+
+=head1 DESCRIPTION
+
+Generated when a key is released.
+
+=head1 METHODS
+
+=head2 char()
+
+Returns the character released.
+
+=head1 SEE ALSO
+
+L<Term::Caca::Event::Key>, L<Term::Caca::Event::Key::Press>
 
 =head1 AUTHORS
 

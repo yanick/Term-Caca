@@ -4,7 +4,7 @@ Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 # VERSION
 
-version 1.0_1
+version 1.1.0
 
 # SYNOPSIS
 
@@ -144,13 +144,9 @@ the mouse is clicked. Other drivers such as X11 work well.
 Imports the drawing. The supported formats are
 
 - "auto": try to guess the format.
-
 - "caca": native libcaca files.
-
 - "ansi": ANSI art (CP437 charset with ANSI colour codes).
-
 - "text": ASCII text file.
-
 - "utf8": UTF-8 text with ANSI color codes.
 
 ### export( :$format = 'caca' )
@@ -160,21 +156,13 @@ Returns the canvas in the given format.
 Supported formats are
 
 - "caca": native libcaca files.
-
 - "ansi": ANSI art (CP437 charset with ANSI colour codes).
-
 - "text": ASCII text file.
-
 - "html": an HTML page with CSS information.
-
 - "html3": an HTML table that should be compatible with most navigators, including textmode ones.
-
 - "irc": UTF-8 text with mIRC colour codes.
-
 - "ps": a PostScript document.
-
 - "svg": an SVG vector image.
-
 - "tga": a TGA image.
 
 ## Colors
@@ -319,13 +307,8 @@ libcaca - [http://caca.zoy.org/](http://caca.zoy.org/)
 
 # AUTHORS
 
-- *
-
-John Beppu <beppu@cpan.org>
-
-- *
-
-Yanick Champoux <yanick@cpan.org>
+- John Beppu <beppu@cpan.org>
+- Yanick Champoux <yanick@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

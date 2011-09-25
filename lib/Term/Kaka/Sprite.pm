@@ -1,9 +1,9 @@
 package Term::Kaka::Sprite;
 BEGIN {
-  $Term::Kaka::Sprite::AUTHORITY = 'cpan:yanick';
+  $Term::Kaka::Sprite::AUTHORITY = 'cpan:YANICK';
 }
-BEGIN {
-  $Term::Kaka::Sprite::VERSION = '1.0_1';
+{
+  $Term::Kaka::Sprite::VERSION = '1.1.0';
 }
 #ABSTRACT:  Term::Caca::Sprite
 
@@ -21,7 +21,7 @@ Term::Kaka::Sprite - Term::Caca::Sprite
 
 =head1 VERSION
 
-version 1.0_1
+version 1.1.0
 
 =head1 AUTHORS
 

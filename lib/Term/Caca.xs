@@ -133,11 +133,6 @@ _export( canvas, format )
 # -==[- Basic functions -]==--------------------------------------------------
 
 void
-_init()
-  CODE:
-    caca_init();
-
-void
 _set_delay(display,usec)
     void *display;
     unsigned int usec;
@@ -171,13 +166,6 @@ _get_canvas(display)
         
 
 
-int
-_get_rendertime()
-  CODE:
-    RETVAL = caca_get_rendertime();
-  OUTPUT:
-    RETVAL
-
 unsigned int
 _get_width(canvas)
     void *canvas;
@@ -203,30 +191,11 @@ _set_display_title(display,title)
   OUTPUT:
     RETVAL
 
-unsigned int
-_get_window_width()
-  CODE:
-    RETVAL = caca_get_window_width();
-  OUTPUT:
-    RETVAL
-
-unsigned int
-_get_window_height()
-  CODE:
-    RETVAL = caca_get_window_height();
-  OUTPUT:
-    RETVAL
-
 void
 _refresh(display)
     void *display;
   CODE:
     caca_refresh_display(display);
-
-void
-_end()
-  CODE:
-    caca_end();
 
 void
 _free_display(display)
@@ -287,15 +256,6 @@ _get_mouse_y(display)
     RETVAL = caca_get_mouse_y(display);
   OUTPUT:
     RETVAL
-
-unsigned int
-_wait_event(event_mask)
-    unsigned int event_mask
-  CODE:
-    RETVAL = caca_wait_event(event_mask);
-  OUTPUT:
-    RETVAL
-
 
 unsigned int
 _get_event_mouse_x(event)

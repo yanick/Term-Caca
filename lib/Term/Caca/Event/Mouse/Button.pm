@@ -1,9 +1,9 @@
 package Term::Caca::Event::Mouse::Button;
 BEGIN {
-  $Term::Caca::Event::Mouse::Button::AUTHORITY = 'cpan:yanick';
+  $Term::Caca::Event::Mouse::Button::AUTHORITY = 'cpan:YANICK';
 }
-BEGIN {
-  $Term::Caca::Event::Mouse::Button::VERSION = '1.0_1';
+{
+  $Term::Caca::Event::Mouse::Button::VERSION = '1.1.0';
 }
 
 use strict;
@@ -40,7 +40,7 @@ Term::Caca::Event::Mouse::Button
 
 =head1 VERSION
 
-version 1.0_1
+version 1.1.0
 
 =head1 AUTHORS
 

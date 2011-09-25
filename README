@@ -2,7 +2,7 @@ NAME
     Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 VERSION
-    version 1.0_1
+    version 1.1.0
 
 SYNOPSIS
       use Term::Caca;

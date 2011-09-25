@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.64.
+signed via the Module::Signature module, version 0.68.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,38 +14,39 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 ced6fadbd3597eea0f4bcd2742e51d6bdd5c253a Build.PL
-SHA1 83cc77a7367dd10c08f94064c2177ae2b0a2b54c Changes
+SHA1 1b05dd30ca0402a36ed6bf6c77693280afd9c0e1 Build.PL
+SHA1 3da3e3499271d8a9cd455a5152ccb06e57213d63 Changes
+SHA1 9978affe8790405c0b6dc438e7fc3ca236786eaf INSTALL
 SHA1 5cf35e7553577c4026f59d3696d3a26a5c109d65 LICENSE
-SHA1 437c6db76589d99876b05378024deec0471531f7 MANIFEST
-SHA1 0d696d8b65c4e2a9818b19ee75d680c0c69de1dc META.json
-SHA1 544d6a6c37b6722bc288f2642b3d90f0c712c790 META.yml
-SHA1 62e0ef2e1665f0b29eafcf6a47625bfa4be5b506 README
-SHA1 2079f065c38d10e81f16a4e034c8b09d98fc06a7 README.mkdn
+SHA1 c7aa494a1774445403e2bf7d13bfb4699cb1673e MANIFEST
+SHA1 a83978df8371d02591d2339a4288b8e75534dba5 META.json
+SHA1 64de937e44abac219e1b95edef86de92dd382762 META.yml
+SHA1 4489c5f1a4417dc376bc4adb68e00178e6ae4185 README
+SHA1 5fbf0a505ebb50e1c2593b663f0f42a1b9a38199 README.mkdn
 SHA1 39597e36fe54bcfbd1015ef546f0940bd30ce6b4 TODO
 SHA1 028c2c7ad4fa34a73a5e27f27e2f8655ee1e1eb4 examples/events.pl
 SHA1 48fc00ecf6468c64452f2113a2ad97baae7bf3db examples/maze.pl
 SHA1 c4a957abd935086cbdb72b862e399505b8c0f4dc inc/MyBuild.pm
-SHA1 936adda3994e8f063e5efa67cda95b84c4f94e71 lib/Term/Caca.pm
-SHA1 e1ae733fb41887064bf32ddb9b1c392e80493469 lib/Term/Caca.xs
-SHA1 c5a8876937fec5e87dde3dc219cc614777d1eb2b lib/Term/Caca/Bitmap.pm
-SHA1 acb185bae7c978a0fca3b29797dafea74515929f lib/Term/Caca/Constants.pm
-SHA1 4b29e6bbe4e34834c92c9424a4ddc1ace089e154 lib/Term/Caca/Event.pm
-SHA1 9733c8d5352057e756eb8ce4d99019c09d336d9d lib/Term/Caca/Event/Key.pm
-SHA1 6a49d5c485edb3cf380462581d345461ed4cd6b3 lib/Term/Caca/Event/Key/Press.pm
-SHA1 4b50a863c467494f497f3d0dbc8b652c30f92d2a lib/Term/Caca/Event/Key/Release.pm
-SHA1 0ac332c6761776452e39d8b16922be3f75b265b0 lib/Term/Caca/Event/Mouse/Button.pm
-SHA1 d9027d748c1a60e4e0ac7b31505482886a170818 lib/Term/Caca/Event/Mouse/Button/Press.pm
-SHA1 0882233f88f147117538e77129cc29afdfecaf97 lib/Term/Caca/Event/Mouse/Button/Release.pm
-SHA1 d30720320987129098424115bf6ecd5c80669d36 lib/Term/Caca/Event/Mouse/Motion.pm
-SHA1 5f0941e59c990b7d3a1e5cc13fe45f7dec0a8865 lib/Term/Caca/Event/Quit.pm
-SHA1 e7cf3b8a4bd2b71baa5817e720ed25adf26c4157 lib/Term/Caca/Event/Resize.pm
-SHA1 1449d43846c8cc6484fe68a87055be1c68ca383c lib/Term/Caca/Sprite.pm
-SHA1 4b92b7cb588a22ad8c007c500d51fce5acc2ce6e lib/Term/Kaka.pm
-SHA1 da64aa3f621d0f7c05f4756836cb23a68f326c6c lib/Term/Kaka/Bitmap.pm
-SHA1 e8fe94e5494981d94ba68f9731d046481167b4bf lib/Term/Kaka/Constants.pm
-SHA1 3d290eea0df9272560b6c52a26047489270ee862 lib/Term/Kaka/Sprite.pm
-SHA1 050aa113e828a52db3c86065c0c0ed50198b7ce8 t/000-report-versions.t
+SHA1 8d1abfa782a0e5f0002d82a031dace1cff61a6e8 lib/Term/Caca.pm
+SHA1 8dca2a1ccaf1747df7ad2a6462f906d3cdaaf842 lib/Term/Caca.xs
+SHA1 0b13d3b55b37cf26ea69145035a39511b5fad354 lib/Term/Caca/Bitmap.pm
+SHA1 b5bfff00545d2a083053e8b8e24415a4af4614f3 lib/Term/Caca/Constants.pm
+SHA1 24559b5a220909a69a60344bbbb443a6b37c6709 lib/Term/Caca/Event.pm
+SHA1 951b0b374c7ac5d4fece45d23999938112b45f54 lib/Term/Caca/Event/Key.pm
+SHA1 8189cc1e58c4091a45a8707c9424e112a1822beb lib/Term/Caca/Event/Key/Press.pm
+SHA1 da4e2757e80da667aea922159ce6ade3d68b464e lib/Term/Caca/Event/Key/Release.pm
+SHA1 333d2902e94dc6f0306a4d54aaf14e827ff8ebf7 lib/Term/Caca/Event/Mouse/Button.pm
+SHA1 3a708a748a73302865bf3a367121db070c3a5b4c lib/Term/Caca/Event/Mouse/Button/Press.pm
+SHA1 86daad1c3c871fde7f9d1fe3d2fcdddedf0cde7c lib/Term/Caca/Event/Mouse/Button/Release.pm
+SHA1 05fd5a2bd8838b03e219722184880eb635b1b8c3 lib/Term/Caca/Event/Mouse/Motion.pm
+SHA1 6f25e051294ac41411a08c2345ca073865057d32 lib/Term/Caca/Event/Quit.pm
+SHA1 1d7a62f6445012c5e78c5464f5340669187b53d3 lib/Term/Caca/Event/Resize.pm
+SHA1 25e8aa7eefb858ac128e6a750ce1e4851c27b5b5 lib/Term/Caca/Sprite.pm
+SHA1 d113227ea4ca634323e78ab4344995611ac6a02e lib/Term/Kaka.pm
+SHA1 cedddb7a6a53ae93e0aac3c958c51c25cccd1c11 lib/Term/Kaka/Bitmap.pm
+SHA1 0f4b9084e960f2c44180109abe763bce03eb68df lib/Term/Kaka/Constants.pm
+SHA1 69fcbb1fdc0cbbf7f787adb227bf1580574a1d74 lib/Term/Kaka/Sprite.pm
+SHA1 473906254ecd96009795d4b7fbc82fac48c03ecd t/000-report-versions.t
 SHA1 b6c44057661bc46a874f1c409c14b337167d1b62 t/00_use.t
 SHA1 86d255a7c9f065a13049108362c949b3e35a4c24 t/01_pod.t
 SHA1 e923679a1bbd8eb8f727e46f5906af25de27ec97 t/02_pod_coverage.t
@@ -54,9 +55,9 @@ SHA1 2cbd3172d8a75e0344f524f0d94e754703ba5b2e t/data/caca.txt
 SHA1 41f5f5b584e206f3072cea323b4782b57e9ed378 t/export.t
 SHA1 7ca0bb247ca7751e8f4456ffc7d7f72b7d90bf7e t/libcaca-version.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1.4.11 (GNU/Linux)
 
-iEYEARECAAYFAk3xbKwACgkQ34Hwf+GwC4yHrwCgvquR7okCfbussYf8B176loEV
-h+sAoJOzanONYvsWV0E6IS/Q9DgyaW8S
-=1yMa
+iEYEARECAAYFAk5/fb4ACgkQ34Hwf+GwC4w2MACgm3ncGXluuBq4SfpCLBIWgmCV
+4ZoAnib4dClpJLBGk6w6pV3ds2CI2Mj7
+=YUgx
 -----END PGP SIGNATURE-----
