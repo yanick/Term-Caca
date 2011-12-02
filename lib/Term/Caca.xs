@@ -434,10 +434,13 @@ _draw_thin_polyline(canvas,x, y, n)
     /* create a C int array out of x and y */
     xc = (int *) malloc((n+1) * sizeof(int *));
     if (!xc) {
+      croak( "could not allocate memory" );
       XSRETURN_UNDEF;
     }
     yc = (int *) malloc((n+1) * sizeof(int *));
     if (!yc) {
+      free(xc);
+      croak( "could not allocate memory" );
       XSRETURN_UNDEF;
     }
     for (i = 0; i <= n; i++) {
