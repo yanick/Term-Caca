@@ -170,6 +170,30 @@ push @EXPORT_OK, '@EVENTS', @{$EXPORT_TAGS{events}};
 
 push @{$EXPORT_TAGS{all}}, uniq map { @$_ } values %EXPORT_TAGS;
 
+=head1 CLASS METHODS
+
+=head3 driver_list 
+
+Returns an hash which keys are the available display drivers
+and the values their descriptions.
+
+=cut
+
+sub driver_list {
+    return @{ _caca_get_display_driver_list() };
+}
+
+=head3 drivers 
+
+Returns the list of available drivers.
+
+=cut
+
+sub drivers {
+    my %list = @{ _caca_get_display_driver_list() };
+    return keys %list;
+}
+
 =head1 METHODS
 
 =head2 Constructor
@@ -178,14 +202,23 @@ push @{$EXPORT_TAGS{all}}, uniq map { @$_ } values %EXPORT_TAGS;
 
 Instantiates a Term::Caca object. 
 
+The optional argument I<driver> can be passed to select a specific display
+driver. If it's not given, the best available driver will be used.
+
 =cut
 
 sub new {
   my $class = shift;
   my $self = {};
   bless $self, $class;
+  my %arg = @_;
 
-  $self->{display} = _create_display();
+  $self->{display} = $arg{driver} 
+                        ? _create_display_with_driver($arg{driver}) 
+                        : _create_display();
+
+  croak "couldn't create display" unless $self->{display};
+
   $self->{canvas}  = _get_canvas($self->{display});
 
   return $self;

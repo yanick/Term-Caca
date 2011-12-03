@@ -147,7 +147,13 @@ _get_delay(display)
   OUTPUT:
     RETVAL
 
-
+void *
+_create_display_with_driver(driver)
+        char *driver;
+    CODE:
+        RETVAL = caca_create_display_with_driver( NULL, driver );
+    OUTPUT:
+        RETVAL
 
 void *
 _create_display()
@@ -576,3 +582,18 @@ _fill_triangle(canvas, x0, y0, x1, y1, x2, y2, c)
     char c;
   CODE:
     caca_fill_triangle(canvas, x0, y0, x1, y1, x2, y2, c);
+
+AV *
+_caca_get_display_driver_list() 
+  CODE:
+    char **drivers;
+    int i;
+    char *d;
+    drivers = (char **)caca_get_display_driver_list();
+    RETVAL = newAV();
+    i = 0;
+    while ( d = (char *)drivers[i++] ) {
+        av_push( RETVAL, newSVpv( d, strlen(d) ) );
+    }
+  OUTPUT:
+    RETVAL
