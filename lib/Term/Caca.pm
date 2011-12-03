@@ -6,9 +6,9 @@ use strict;
 use warnings;
 no warnings qw/ uninitialized /;
 
-our $VERSION = '1.1.0';
-
 use parent qw/ Exporter DynaLoader /;
+
+our $VERSION = '1.2.0';
 
 Term::Caca->bootstrap($VERSION);
 
