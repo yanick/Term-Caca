@@ -37,5 +37,6 @@ t/01_pod.t
 t/02_pod_coverage.t
 t/basic.t
 t/data/caca.txt
+t/driver.t
 t/export.t
 t/libcaca-version.t
