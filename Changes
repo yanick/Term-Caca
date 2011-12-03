@@ -1,6 +1,10 @@
 Revision history for Term::Caca
 
 {{$NEXT}}
+    [BUG FIXES]
+        * protect against a potential memory leak (rt62971)
+            Reported by Kevin Ryde.
+
 
 1.1.0     2011-09-25
     [BUG FIXES]
