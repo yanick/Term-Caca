@@ -9,9 +9,9 @@ use strict;
 use warnings;
 no warnings qw/ uninitialized /;
 
-our $VERSION = '1.1.0';
-
 use parent qw/ Exporter DynaLoader /;
+
+our $VERSION = '1.2.0';
 
 Term::Caca->bootstrap($VERSION);
 
@@ -107,12 +107,29 @@ push @EXPORT_OK, '@EVENTS', @{$EXPORT_TAGS{events}};
 push @{$EXPORT_TAGS{all}}, uniq map { @$_ } values %EXPORT_TAGS;
 
 
+sub driver_list {
+    return @{ _caca_get_display_driver_list() };
+}
+
+
+sub drivers {
+    my %list = @{ _caca_get_display_driver_list() };
+    return keys %list;
+}
+
+
 sub new {
   my $class = shift;
   my $self = {};
   bless $self, $class;
+  my %arg = @_;
 
-  $self->{display} = _create_display();
+  $self->{display} = $arg{driver} 
+                        ? _create_display_with_driver($arg{driver}) 
+                        : _create_display();
+
+  croak "couldn't create display" unless $self->{display};
+
   $self->{canvas}  = _get_canvas($self->{display});
 
   return $self;
@@ -424,7 +441,7 @@ Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.0
 
 =head1 SYNOPSIS
 
@@ -488,6 +505,17 @@ events are
     MOUSE_PRESS MOUSE_RELEASE   MOUSE_MOTION
     RESIZE      QUIT
 
+=head1 CLASS METHODS
+
+=head3 driver_list 
+
+Returns an hash which keys are the available display drivers
+and the values their descriptions.
+
+=head3 drivers 
+
+Returns the list of available drivers.
+
 =head1 METHODS
 
 =head2 Constructor
@@ -495,6 +523,9 @@ events are
 =head3 new
 
 Instantiates a Term::Caca object. 
+
+The optional argument I<driver> can be passed to select a specific display
+driver. If it's not given, the best available driver will be used.
 
 =head2 Display and Canvas
 

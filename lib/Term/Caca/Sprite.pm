@@ -3,7 +3,7 @@ BEGIN {
   $Term::Caca::Sprite::AUTHORITY = 'cpan:YANICK';
 }
 {
-  $Term::Caca::Sprite::VERSION = '1.1.0';
+  $Term::Caca::Sprite::VERSION = '1.2.0';
 }
 #ABSTRACT: an OO-interface to caca_sprite
 
@@ -66,7 +66,7 @@ Term::Caca::Sprite - an OO-interface to caca_sprite
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.0
 
 =head1 SYNOPSIS
 

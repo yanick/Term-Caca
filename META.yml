@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621'
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,58 +19,58 @@ name: Term-Caca
 provides:
   Term::Caca:
     file: lib/Term/Caca.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Bitmap:
     file: lib/Term/Caca/Bitmap.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Constants:
     file: lib/Term/Caca/Constants.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Event:
     file: lib/Term/Caca/Event.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Event::Key:
     file: lib/Term/Caca/Event/Key.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Event::Key::Press:
     file: lib/Term/Caca/Event/Key/Press.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Event::Key::Release:
     file: lib/Term/Caca/Event/Key/Release.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Event::Mouse::Button:
     file: lib/Term/Caca/Event/Mouse/Button.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Event::Mouse::Button::Press:
     file: lib/Term/Caca/Event/Mouse/Button/Press.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Event::Mouse::Button::Release:
     file: lib/Term/Caca/Event/Mouse/Button/Release.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Event::Mouse::Motion:
     file: lib/Term/Caca/Event/Mouse/Motion.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Event::Quit:
     file: lib/Term/Caca/Event/Quit.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Event::Resize:
     file: lib/Term/Caca/Event/Resize.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Caca::Sprite:
     file: lib/Term/Caca/Sprite.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Kaka:
     file: lib/Term/Kaka.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Kaka::Bitmap:
     file: lib/Term/Kaka/Bitmap.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Kaka::Constants:
     file: lib/Term/Kaka/Constants.pm
-    version: v1.1.0
+    version: v1.2.0
   Term::Kaka::Sprite:
     file: lib/Term/Kaka/Sprite.pm
-    version: v1.1.0
+    version: v1.2.0
 requires:
   Carp: 0
   Const::Fast: 0
@@ -89,5 +89,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Term-Caca
   homepage: http://search.cpan.org/dist/Term-Caca/
   repository: https://github.com/yanick/Term-Caca.git
-version: 1.1.0
+version: 1.2.0
 x_authority: cpan:YANICK

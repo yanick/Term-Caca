@@ -3,7 +3,7 @@ BEGIN {
   $Term::Kaka::Constants::AUTHORITY = 'cpan:YANICK';
 }
 {
-  $Term::Kaka::Constants::VERSION = '1.1.0';
+  $Term::Kaka::Constants::VERSION = '1.2.0';
 }
 #ABSTRACT: Term::Caca::Constants
 
@@ -26,7 +26,7 @@ Term::Kaka::Constants - Term::Caca::Constants
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.0
 
 =head1 AUTHORS
 

@@ -3,7 +3,7 @@ BEGIN {
   $Term::Caca::Event::Mouse::Motion::AUTHORITY = 'cpan:YANICK';
 }
 {
-  $Term::Caca::Event::Mouse::Motion::VERSION = '1.1.0';
+  $Term::Caca::Event::Mouse::Motion::VERSION = '1.2.0';
 }
 
 use strict;
@@ -41,7 +41,7 @@ Term::Caca::Event::Mouse::Motion
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.0
 
 =head1 AUTHORS
 

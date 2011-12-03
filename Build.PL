@@ -20,7 +20,7 @@ my %module_build_args = (
     "Yanick Champoux <yanick\@cpan.org>"
   ],
   "dist_name" => "Term-Caca",
-  "dist_version" => "1.1.0",
+  "dist_version" => "1.2.0",
   "license" => "unrestricted",
   "module_name" => "Term::Caca",
   "recommends" => {},

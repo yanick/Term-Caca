@@ -3,7 +3,7 @@ BEGIN {
   $Term::Caca::Constants::AUTHORITY = 'cpan:YANICK';
 }
 {
-  $Term::Caca::Constants::VERSION = '1.1.0';
+  $Term::Caca::Constants::VERSION = '1.2.0';
 }
 #ABSTRACT: libcaca constants from caca.h
 
@@ -326,7 +326,7 @@ Term::Caca::Constants - libcaca constants from caca.h
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.0
 
 =head1 SYNOPSIS
 

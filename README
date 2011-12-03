@@ -2,7 +2,7 @@ NAME
     Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 VERSION
-    version 1.1.0
+    version 1.2.0
 
 SYNOPSIS
       use Term::Caca;
@@ -61,10 +61,22 @@ EXPORTS
         MOUSE_PRESS MOUSE_RELEASE   MOUSE_MOTION
         RESIZE      QUIT
 
+CLASS METHODS
+   driver_list
+    Returns an hash which keys are the available display drivers and the
+    values their descriptions.
+
+   drivers
+    Returns the list of available drivers.
+
 METHODS
   Constructor
    new
     Instantiates a Term::Caca object.
+
+    The optional argument *driver* can be passed to select a specific
+    display driver. If it's not given, the best available driver will be
+    used.
 
   Display and Canvas
    set_title( $title )

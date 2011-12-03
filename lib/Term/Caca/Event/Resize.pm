@@ -3,7 +3,7 @@ BEGIN {
   $Term::Caca::Event::Resize::AUTHORITY = 'cpan:YANICK';
 }
 {
-  $Term::Caca::Event::Resize::VERSION = '1.1.0';
+  $Term::Caca::Event::Resize::VERSION = '1.2.0';
 }
 
 use strict;
@@ -43,7 +43,7 @@ Term::Caca::Event::Resize
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.0
 
 =head1 AUTHORS
 

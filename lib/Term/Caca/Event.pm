@@ -3,7 +3,7 @@ BEGIN {
   $Term::Caca::Event::AUTHORITY = 'cpan:YANICK';
 }
 {
-  $Term::Caca::Event::VERSION = '1.1.0';
+  $Term::Caca::Event::VERSION = '1.2.0';
 }
 # ABSTRACT: base class for Term::Caca events
 
@@ -44,7 +44,7 @@ Term::Caca::Event - base class for Term::Caca events
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.0
 
 =head1 DESCRIPTION
 
