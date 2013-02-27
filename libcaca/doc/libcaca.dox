@@ -1,0 +1,61 @@
+/** \mainpage libcaca Documentation
+
+ \section intro Introduction
+
+ \e libcaca is a graphics library that outputs text instead of pixels,
+ so that it can work on older video cards or text terminals. It is not
+ unlike the famous AAlib library. \e libcaca can use almost any virtual
+ terminal to work, thus it should work on all Unix systems (including
+ Mac OS X) using either the S-Lang library or the ncurses library, on DOS
+ using the conio library, and on Windows systems using the native Win32
+ console, the conio library, or using S-Lang or ncurses (through Cygwin
+ emulation). There is also a native X11 driver, and an OpenGL driver
+ (through freeglut) that does not require a text terminal. For machines
+ without a screen, the raw driver can be used to send the output to another
+ machine, using for instance cacaserver.
+
+ \e libcaca is free software, released under the Do What The Fuck You
+ Want To Public License. This ensures that no one, not even the \e libcaca
+ developers, will ever have anything to say about what you do with the
+ software. It used to be licensed under the GNU Lesser General Public
+ License, but that was not free enough.
+
+ \section devel Developer's documentation
+
+ The complete \e libcaca programming interface is
+ available from the following header:
+
+ - caca.h
+
+ There is language-specific documentation for the various bindings:
+
+ - \subpage libcaca-ruby
+
+ Some other topics are covered by specific sections:
+
+ - \subpage libcaca-tutorial
+ - \subpage libcaca-migrating
+
+ There is also information specially targeted at \e libcaca developers:
+
+ - \subpage libcaca-font
+ - \subpage libcaca-canvas
+ - \subpage libcaca-style
+
+ \section user User's documentation
+
+ - \subpage libcaca-env
+
+ \section misc Misc
+
+ - \subpage libcaca-news
+ - \subpage libcaca-authors
+ - \subpage libcaca-thanks
+
+ \section license License
+
+ Permission is granted to copy, distribute and/or modify this document
+ under the terms of the Do What The Fuck You Want To Public License, version
+ 2 as published by Sam Hocevar. For details see http://sam.zoy.org/wtfpl/ .
+
+*/

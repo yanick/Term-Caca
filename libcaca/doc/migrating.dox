@@ -1,0 +1,226 @@
+/** \page libcaca-migrating Migrating from libcaca 0.x to the 1.0 API
+
+ This section will guide you through the migration of a \e libcaca 0.x
+ application to the latest API version.
+
+ \section foo1 Overview
+
+ The most important change in the 1.0 API of \e libcaca is the
+ object-oriented design. See these two examples for a rough idea of
+ what changed:
+
+<table border="0"><tr><td valign="top">
+\code
+#include <caca.h>
+
+/* libcaca program - 0.x API */
+int main(void)
+{
+    /* Initialise libcaca */
+    caca_init();
+    /* Set window title */
+    caca_set_window_title("Window");
+    /* Choose drawing colours */
+    caca_set_color(CACA_COLOR_BLACK,
+                   CACA_COLOR_WHITE);
+    /* Draw a string at (0, 0) */
+    caca_putstr(0, 0, "Hello world!");
+    /* Refresh display */
+    caca_refresh();
+    /* Wait for a key press event */
+    caca_wait_event(CACA_EVENT_KEY_PRESS);
+    /* Clean up library */
+    caca_end();
+
+    return 0;
+}
+\endcode
+</td><td>
+\code
+#include <caca.h>
+
+/* libcaca program - 1.0 API */
+int main(void)
+{
+    /* Initialise libcaca */
+    caca_canvas_t *cv;
+    caca_display_t *dp;
+    dp = caca_create_display(NULL);
+    cv = caca_get_canvas(dp);
+    /* Set window title */
+    caca_set_display_title(dp, "Window");
+    /* Choose drawing colours */
+    caca_set_color_ansi(cv, CACA_BLACK,
+                            CACA_WHITE);
+    /* Draw a string at (0, 0) */
+    caca_put_str(cv, 0, 0, "Hello world!");
+    /* Refresh display */
+    caca_refresh_display();
+    /* Wait for a key press event */
+    caca_get_event(dp, CACA_EVENT_KEY_PRESS,
+                   NULL, -1);
+    /* Clean up library */
+    caca_free_display(dp);
+
+    return 0;
+}
+\endcode
+</td></tr></table>
+
+ Note the following important things:
+
+ - Most functions now take an object handle as their first argument.
+
+ \section foo2 Migration strategy
+
+ You have two ways to migrate your application to use \e libcaca 1.x:
+
+ - Port your code using the function equivalence list. This is the preferred
+   way because new functions are thread safe and offer much more features
+   to both the programmer and the end user.
+ - Use the legacy compatibility layer.
+
+ Using the compatibility layer is as easy as adding the following three lines:
+
+<table border="0"><tr><td valign="top">
+\code
+#include <caca.h>
+
+/* libcaca program - 0.x API */
+...
+\endcode
+</td><td>
+\code
+#include <caca.h>
+#ifdef CACA_API_VERSION_1
+#   include <caca0.h>
+#endif
+
+/* libcaca program - 0.x API */
+...
+\endcode
+</td></tr></table>
+
+ The modified code is guaranteed to build both with \e libcaca 0.x and
+ \e libcaca 1.0.
+
+ \section foo3 Function equivalence list
+
+ \subsection bar1 Basic functions
+
+ - \b caca_init(): use caca_create_canvas() to create a \e libcaca canvas,
+   followed by caca_create_display() to attach a \e libcaca display to it.
+   Alternatively, caca_create_display() with a NULL argument will create a
+   canvas automatically.
+ - \b caca_set_delay(): use caca_set_display_time().
+ - \b caca_get_feature(): deprecated.
+ - \b caca_set_feature(): deprecated, see caca_set_dither_antialias(),
+   caca_set_dither_color() and caca_set_dither_mode() instead.
+ - \b caca_get_feature_name(): deprecated, see caca_get_dither_mode_list(),
+   caca_get_dither_antialias_list() and caca_get_dither_color_list()
+   instead.
+ - \b caca_get_rendertime(): use caca_get_display_time().
+ - \b caca_get_width(): use caca_get_canvas_width().
+ - \b caca_get_height(): use caca_get_canvas_height().
+ - \b caca_set_window_title(): use caca_set_display_title().
+ - \b caca_get_window_width(): use caca_get_display_width().
+ - \b caca_get_window_height(): use caca_get_display_height().
+ - \b caca_refresh(): use caca_refresh_display().
+ - \b caca_end(): use caca_free_display() to detach the \e libcaca display,
+   followed by caca_free_canvas() to free the underlying \e libcaca canvas.
+   Alternatively, if the canvas was created by caca_create_display(), it
+   will be automatically destroyed by caca_free_display().
+
+ \subsection bar2 Event handling
+
+ - \b caca_get_event(): unchanged, but the event information retrieval
+   changed a lot.
+ - \b caca_wait_event(): use caca_get_event() with a \c timeout argument
+   of \b -1.
+ - \b caca_get_mouse_x(): unchanged.
+ - \b caca_get_mouse_y(): unchanged.
+
+ \subsection bar3 Character printing
+
+ - \b caca_set_color(): use caca_set_color_ansi() or caca_set_color_argb().
+ - \b caca_get_fg_color(): use caca_get_attr().
+ - \b caca_get_bg_color(): use caca_get_attr().
+ - \b caca_get_color_name(): this function is now deprecated due to major
+   uselessness.
+ - \b caca_putchar(): use caca_put_char().
+ - \b caca_putstr(): use caca_put_str().
+ - \b caca_printf(): unchanged.
+ - \b caca_clear(): use caca_clear_canvas().
+
+ \subsection bar4 Primitives drawing
+
+ These functions are almost unchanged, except for Unicode support and the
+ fact that they now act on a given canvas.
+
+ - \b caca_draw_line(): unchanged.
+ - \b caca_draw_polyline(): unchanged.
+ - \b caca_draw_thin_line(): unchanged.
+ - \b caca_draw_thin_polyline(): unchanged.
+
+ - \b caca_draw_circle(): unchanged.
+ - \b caca_draw_ellipse(): unchanged.
+ - \b caca_draw_thin_ellipse(): unchanged.
+ - \b caca_fill_ellipse(): unchanged.
+
+ - \b caca_draw_box(): unchanged, but the argument meaning changed (width
+                       and height instead of corner coordinates).
+ - \b caca_draw_thin_box(): use caca_draw_thin_box() or caca_draw_cp437_box(),
+                            also the argument meaning changed (width
+                            and height instead of corner coordinates).
+ - \b caca_fill_box(): unchanged, but the argument meaning changed (width
+                       and height instead of corner coordinates).
+
+ - \b caca_draw_triangle(): unchanged.
+ - \b caca_draw_thin_triangle(): unchanged.
+ - \b caca_fill_triangle(): unchanged.
+
+ \subsection bar5 Mathematical functions
+
+ - \b caca_rand(): unchanged, but the second argument is different, make
+   sure you take that into account.
+ - \b caca_sqrt(): this function is now deprecated, use your system's
+   \b sqrt() call instead.
+
+ \subsection bar6 Sprite handling
+
+ The newly introduced canvases can have several frames. Sprites are hence
+ completely deprecated.
+
+ - \b caca_load_sprite(): use caca_import_file().
+ - \b caca_get_sprite_frames(): use caca_get_frame_count().
+ - \b caca_get_sprite_width(): use caca_get_canvas_width().
+ - \b caca_get_sprite_height(): use caca_get_canvas_height().
+ - \b caca_get_sprite_dx(): use caca_get_canvas_handle_x().
+ - \b caca_get_sprite_dy(): use caca_get_canvas_handle_y().
+ - \b caca_draw_sprite(): use caca_set_frame() and caca_blit().
+ - \b caca_free_sprite(): use caca_free_canvas().
+
+ \subsection bar7 Bitmap handling
+
+ Bitmaps have been renamed to dithers, because these objects do not in fact
+ store any pixels, they just have information on how bitmaps will be dithered.
+
+ - \b caca_create_bitmap(): use caca_create_dither().
+ - \b caca_set_bitmap_palette(): use caca_set_dither_palette().
+ - \b caca_draw_bitmap(): use caca_dither_bitmap().
+ - \b caca_free_bitmap(): use caca_free_dither().
+
+ \section foo4 Compilation
+
+ The \c caca-config utility is deprecated in favour of the standard
+ \c pkg-config interface:
+
+\code
+gcc -c foobar.c -o foobar.o `pkg-config --cflags caca`
+gcc foobar.o -o foobar `pkg-config --libs caca`
+\endcode
+
+ \c caca-config is still provided as a convenience tool but may be removed
+ in the future.
+
+*/
