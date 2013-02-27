@@ -1,15 +1,10 @@
 package Term::Caca::Event::Quit;
+# ABSTRACT: event triggered when the display is quit
 
 use strict;
 use warnings;
 
-use parent 'Term::Caca::Event';
-use Term::Caca;
-use Method::Signatures;
-
-sub new {
-    my $class = shift;
-    return bless $class->SUPER::new( @_ ), $class;
-}
+use Moose;
+extends 'Term::Caca::Event';
 
 1;

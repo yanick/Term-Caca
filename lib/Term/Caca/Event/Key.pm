@@ -23,14 +23,10 @@ Generated when a key is pressed or released.
 use strict;
 use warnings;
 
-use parent 'Term::Caca::Event';
-use Method::Signatures;
+use Moose;
 
-sub new { 
-    my $class = shift;
-    my $self = Term::Caca::Event->new( @_ );
-    return bless $self, $class;
-}
+extends 'Term::Caca::Event';
+
 
 =method char()
 
@@ -38,8 +34,8 @@ Returns the character pressed or released.
 
 =cut
 
-method char {
-    return Term::Caca::_get_event_key_ch( $self->_event );
+sub char {
+    return chr Term::Caca::caca_get_event_key_ch( $_[0]->event );
 }
 
 1;
