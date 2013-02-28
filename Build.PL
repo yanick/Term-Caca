@@ -40,7 +40,7 @@ my %module_build_args = (
     "vars" => 0,
     "warnings" => 0
   },
-  "script_files" => []
+  "script_files" => [],
 );
 
 

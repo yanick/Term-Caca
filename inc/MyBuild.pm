@@ -17,8 +17,8 @@ sub new {
     my ( $self, %args ) = @_;
 
     return $self->SUPER::new( 
-        extra_compiler_flags => "-L$Orig_CWD/share/lib",
-        extra_linker_flags   => "-L$Orig_CWD/share/lib $Orig_CWD/share/lib/libcaca.so",
+#        extra_compiler_flags => "-L$Orig_CWD/share/lib -L$Orig_CWD/libcaca/caca/.libs",
+#        extra_linker_flags   => "-L$Orig_CWD/share/lib -L$Orig_CWD/libcaca/caca/.libs -lcaca",
         %args );
 }
 
@@ -124,6 +124,13 @@ sub ACTION_clean {
 
     path($_)->remove for path('share')->children;
 
+    _chdir_to_libcaca;
+
+    $self->_run('make clean')
+        or do { warn "cleaning ./libcaca failed"; return 0 };
+
+    _chdir_back;
+
     1;
 }
 
@@ -140,6 +147,20 @@ sub ACTION_code {
         or do { warn "installing libcaca in /share failed"; return 0 };
 
     _chdir_back;
+
+    open my $ldd, '-|', 'ldd libcaca/caca/.libs/libcaca.so' or die;
+    my @libs;
+    while( <$ldd> ) {
+        next unless /lib(\w*?)\.so/;
+        push @libs, $1;
+    }
+
+    push @{$self->{properties}{extra_linker_flags}}, map { "-l$_" } @libs;
+
+    $self->{properties}{objects} = [
+        grep { /\.o$/ }
+        path( 'libcaca/caca/.libs' )->children
+    ];
 
     $self->SUPER::ACTION_code;
     
