@@ -134,6 +134,18 @@ sub ACTION_clean {
     1;
 }
 
+sub ACTION_realclean {
+    my $self = shift;
+
+    $self->SUPER::ACTION_realclean;
+
+    _chdir_to_libcaca;
+
+    unlink 'config.status';
+
+    _chdir_back;
+}
+
 
 sub ACTION_code {
     my $self = shift;
