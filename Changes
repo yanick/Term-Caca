@@ -1,6 +1,9 @@
 Revision history for Term::Caca
 
 {{$NEXT}}
+    [API CHANGES]  
+        * remove Term::Kaka.
+
     [DOCUMENTATIONS]
         * add META 'Help Wanted' information
 
