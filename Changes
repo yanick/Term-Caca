@@ -1,6 +1,8 @@
 Revision history for Term::Caca
 
 {{$NEXT}}
+
+2.0_0     2013-03-02
     [API CHANGES]  
         * remove Term::Kaka.
         * include libcaca with the distribution.
