@@ -1,4 +1,10 @@
 package Term::Caca::Event::Mouse::Button;
+BEGIN {
+  $Term::Caca::Event::Mouse::Button::AUTHORITY = 'cpan:YANICK';
+}
+{
+  $Term::Caca::Event::Mouse::Button::VERSION = '2.0_0';
+}
 
 use strict;
 use warnings;
@@ -23,4 +29,38 @@ method middle { return 2 == $self->index }
 
 1;
 
+__END__
 
+=pod
+
+=head1 NAME
+
+Term::Caca::Event::Mouse::Button
+
+=head1 VERSION
+
+version 2.0_0
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut

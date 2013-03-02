@@ -1,0 +1,35 @@
+---
+abstract: 'perl interface for libcaca (Colour AsCii Art library)'
+author:
+  - 'John Beppu <beppu@cpan.org>'
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Term-Caca
+requires:
+  Carp: 0
+  Const::Fast: 0
+  DynaLoader: 0
+  Exporter: 0
+  List::MoreUtils: 0
+  Method::Signatures: 0
+  base: 0
+  constant: 0
+  parent: 0
+  perl: v5.10.0
+  strict: 0
+  vars: 0
+  warnings: 0
+version: v1.2.1

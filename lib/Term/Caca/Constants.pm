@@ -1,4 +1,10 @@
 package Term::Caca::Constants;
+BEGIN {
+  $Term::Caca::Constants::AUTHORITY = 'cpan:YANICK';
+}
+{
+  $Term::Caca::Constants::VERSION = '2.0_0';
+}
 #ABSTRACT: libcaca constants from caca.h
 
 use strict;
@@ -310,8 +316,15 @@ use constant {
 
 1;
 
-__END__
+=pod
 
+=head1 NAME
+
+Term::Caca::Constants - libcaca constants from caca.h
+
+=head1 VERSION
+
+version 2.0_0
 
 =head1 SYNOPSIS
 
@@ -325,8 +338,32 @@ Only import the constants pertaining to events and keys:
 
 =head1 DESCRIPTION
 
+=head1 AUTHORS
 
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
 
 =cut
+
+__END__
+
+
 
 # $Id: Constants.pm,v 1.1 2004/10/18 21:00:56 beppu Exp $
