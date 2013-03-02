@@ -1,0 +1,52 @@
+/** \page libcaca-tutorial A libcaca tutorial
+
+First, a very simple working program, to check for basic libcaca
+functionalities.
+
+\code
+
+#include <caca.h>
+
+int main(void)
+{
+    caca_canvas_t *cv; caca_display_t *dp; caca_event_t ev;
+
+    dp = caca_create_display(NULL);
+    if(!dp) return 1;
+    cv = caca_get_canvas(dp);
+
+    caca_set_display_title(dp, "Hello!");
+    caca_set_color_ansi(cv, CACA_BLACK, CACA_WHITE);
+    caca_put_str(cv, 0, 0, "This is a message");
+    caca_refresh_display(dp);
+    caca_get_event(dp, CACA_EVENT_KEY_PRESS, &ev, -1);
+    caca_free_display(dp);
+
+    return 0;
+}
+
+\endcode
+
+What does it do?
+ - Create a display. Physically, the display is either a window or a context
+   in a terminal (ncurses, slang) or even the whole screen (VGA).
+ - Get the display's associated canvas. A canvas is the surface where
+   everything happens: writing characters, sprites, strings, images... It is
+   unavoidable. Here the size of the canvas is set by the display.
+ - Set the display's window name (only available in windowed displays, does
+   nothing otherwise).
+ - Set the current canvas colours to black background and white foreground.
+ - Write the string \c "This is a message" onto the canvas, using the current
+   colour pair.
+ - Refresh the display, causing the text to be effectively displayed.
+ - Wait for an event of type \c CACA_EVENT_KEY_PRESS.
+ - Free the display (release memory). Since it was created together with the
+   display, the canvas will be automatically freed as well.
+
+You can then compile this code on an UNIX-like system using the following
+commans (requiring \c pkg-config and \c gcc):
+\code
+gcc `pkg-config --libs --cflags caca` example.c -o example
+\endcode
+
+*/

@@ -3,6 +3,7 @@ Revision history for Term::Caca
 {{$NEXT}}
     [API CHANGES]  
         * remove Term::Kaka.
+        * include libcaca with the distribution.
 
     [DOCUMENTATIONS]
         * add META 'Help Wanted' information

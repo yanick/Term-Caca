@@ -18,3 +18,5 @@ MANIFEST\.SKIP
 \.git
 lib/Term/Caca\.c
 \.o$
+share/
+^MYMETA\.json$
