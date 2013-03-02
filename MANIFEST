@@ -1,5 +1,6 @@
 Build.PL
 Changes
+Changes.orig
 INSTALL
 LICENSE
 MANIFEST
@@ -27,11 +28,10 @@ lib/Term/Caca/Event/Mouse/Motion.pm
 lib/Term/Caca/Event/Quit.pm
 lib/Term/Caca/Event/Resize.pm
 lib/Term/Caca/Sprite.pm
-lib/Term/Kaka.pm
-lib/Term/Kaka/Bitmap.pm
-lib/Term/Kaka/Constants.pm
-lib/Term/Kaka/Sprite.pm
-t/000-report-versions.t
+libcaca/Build
+libcaca/MYMETA.yml
+t/00-compile.t
+t/000-report-versions-tiny.t
 t/00_use.t
 t/01_pod.t
 t/02_pod_coverage.t
@@ -40,3 +40,4 @@ t/data/caca.txt
 t/driver.t
 t/export.t
 t/libcaca-version.t
+xt/release/unused-vars.t
