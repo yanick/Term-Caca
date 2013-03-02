@@ -1,10 +1,8 @@
 Build.PL
 Changes
-Changes.orig
 INSTALL
 LICENSE
 MANIFEST
-MANIFEST.orig
 META.json
 META.yml
 README.mkdn
@@ -14,7 +12,6 @@ examples/events.pl
 examples/maze.pl
 inc/MyBuild.pm
 lib/Term/Caca.pm
-lib/Term/Caca.pm.orig
 lib/Term/Caca.xs
 lib/Term/Caca/Bitmap.pm
 lib/Term/Caca/Constants.pm

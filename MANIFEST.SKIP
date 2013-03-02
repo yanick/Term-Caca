@@ -1,3 +1,4 @@
+\.orig$
 \.build
 dist\.ini
 MANIFEST\.SKIP
