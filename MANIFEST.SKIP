@@ -1,3 +1,4 @@
+\.mailmap
 \.orig$
 \.build
 dist\.ini
