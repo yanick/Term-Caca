@@ -12,9 +12,8 @@ plan skip_all => 'no driver available to run the tests' unless $driver;
 
 my $t = Term::Caca->new( driver => $driver );
 
-$t = $t->set_title( __FILE__ );
+$t->title( __FILE__ )->refresh_delay( 1 );
 
-$t = $t->set_refresh_delay( 1 );
 diag $t->rendering_time;
 
 $t->set_color( [ 15, 15, 0, 0 ], 'ffff' );

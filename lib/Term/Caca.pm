@@ -6,18 +6,14 @@ use strict;
 use warnings;
 no warnings qw/ uninitialized /;
 
-use experimental qw/
-    signatures
-    postderef
-/;
-
-use parent qw/ Exporter /;
-
 our $VERSION = '2.0_0';
 
 use Carp;
 use Const::Fast;
 use List::MoreUtils qw/ uniq /;
+
+use Alien::caca;
+use FFI::Platypus;
 
 use Term::Caca::Event::Key::Press;
 use Term::Caca::Event::Key::Release;
@@ -27,7 +23,34 @@ use Term::Caca::Event::Mouse::Button::Release;
 use Term::Caca::Event::Resize;
 use Term::Caca::Event::Quit;
 
-use Moo;
+use Moose;
+
+use MooseX::Attribute::Chained;
+use MooseX::MungeHas { 
+    has_ro => [ 'is_ro' ], 
+    has_rw => [ 'is_rw' ], 
+};
+
+use experimental qw/
+    signatures
+    postderef
+/;
+
+my $ffi = FFI::Platypus->new;
+$ffi->lib(Alien::caca->dynamic_libs);
+
+$ffi->load_custom_type('::StringArray' => 'string_array');
+$ffi->load_custom_type('::StringPointer' => 'string_pointer');
+ 
+$ffi->attach( 'caca_get_display_driver_list' => [] => 'string_array' );
+$ffi->attach( 'caca_create_display_with_driver' => [ 'opaque', 'string' ] => 'opaque' );
+$ffi->attach( 'caca_set_display_title' => [ 'opaque', 'string' ] => 'int' );
+$ffi->attach( 'caca_set_display_time' => [ 'opaque', 'int' ] => 'int' );
+$ffi->attach( 'caca_get_display_time' => [ 'opaque' ] => 'int' );
+$ffi->attach( 'caca_get_canvas' => [ 'opaque' ] => 'opaque' );
+$ffi->attach( 'caca_set_color_argb' => [ 'opaque', 'int' ] => 'opaque' );
+$ffi->attach( 'caca_put_char' => [ 'opaque', 'int', 'int', 'char' ] => 'opaque' );
+$ffi->attach( 'caca_refresh_display' => [ 'opaque' ] => 'opaque' );
 
 
 our @EXPORT_OK;
@@ -105,43 +128,69 @@ push @EXPORT_OK, '@EVENTS', @{$EXPORT_TAGS{events}};
 
 push @{$EXPORT_TAGS{all}}, uniq map { @$_ } values %EXPORT_TAGS;
 
-
 sub driver_list {
-    return @{ _caca_get_display_driver_list() };
+    +{ caca_get_display_driver_list()->@* } 
 }
-
 
 sub drivers {
-    my %list = @{ _caca_get_display_driver_list() };
-    return keys %list;
+    keys driver_list()->%*;
 }
 
+has_ro driver =>
+    predicate => 1;
 
-sub new {
-  my $class = shift;
-  my $self = {};
-  bless $self, $class;
-  my %arg = @_;
+has_ro display => sub($self) {
+    ( $self->has_driver 
+        ? caca_create_display_with_driver(undef,$self->driver)
+        : caca_create_display() ) or croak "couldn't create display";
+};
 
-  $self->{display} = $arg{driver} 
-                        ? _create_display_with_driver($arg{driver}) 
-                        : _create_display();
+has_ro canvas => sub($self) { caca_get_canvas($self->display) };
 
-  croak "couldn't create display" unless $self->{display};
+has_rw title => (
+    traits => [ 'Chained' ],
+    trigger => sub($self,$title) {
+        caca_set_display_title($self->display, $title);
+    }
+);
 
-  $self->{canvas}  = _get_canvas($self->{display});
+has_rw refresh_delay => (
+    traits => [ 'Chained' ],
+    trigger => sub($self,$seconds) {
+        caca_set_display_time($self->display,int( $seconds * 1_000_000 ));
+    }
+);
 
-  return $self;
+sub refresh ($self) { caca_refresh_display($self->display) }
+
+sub rendering_time($self) {
+  return caca_get_display_time($self->display)/1_000_000;
 }
 
-sub display($self) {
-    return $self->{display};
+sub set_color( $self, $foreground, $background ) {
+    if ( exists $COLORS{uc $foreground} ) {
+        return $self->set_ansi_color( 
+            map { $COLORS{uc $_} } $foreground, $background 
+        );
+    }
+
+    caca_set_color_argb($self->canvas,map { $self->_arg_to_color( $_ ) } $foreground, $background );
 }
 
-sub canvas($self) {
-    return $self->{canvas};
+sub _arg_to_color($self,$arg) {
+
+    return hex $arg unless ref $arg;
+
+    return hex sprintf "%x%x%x%x", @$arg;
 }
 
+sub put_char ( $self, $coord, $char ) {
+    caca_put_char( $self->canvas, @$coord, ord substr $char, 0, 1 );
+}
+
+1;
+
+__END__
 
 sub set_title ( $self, $title ) {
   _set_display_title($self->display, $title);
@@ -155,11 +204,6 @@ sub refresh($self) {
   return $self;
 }
 
-
-sub set_refresh_delay ( $self, $seconds ) {
-  _set_delay($self->display,int( $seconds * 1_000_000 ));
-  return $self;
-}
 
 
 sub rendering_time($self) {
@@ -246,13 +290,6 @@ sub set_color( $self, $foreground, $background ) {
     return $self;
 }
 
-sub _arg_to_color {
-    my $arg = shift;
-
-    return hex $arg unless ref $arg;
-
-    return hex sprintf "%x%x%x%x", @$arg;
-}
 
 
 sub get_feature {
