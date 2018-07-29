@@ -11,7 +11,6 @@ classes, and shouldn't be used directly.
 use strict;
 use warnings;
 
-use Method::Signatures;
 use Term::Caca;
 
 sub new {
@@ -24,7 +23,7 @@ sub new {
     return $self;
 }
 
-method _event { $self->{event} }
+sub _event { $_[0]->{event} }
 
 sub DESTROY {
     my $self = shift;

@@ -5,23 +5,22 @@ use warnings;
 
 use parent 'Term::Caca::Event';
 use Term::Caca;
-use Method::Signatures;
 
 sub new {
     my $class = shift;
     return bless $class->SUPER::new( @_ ), $class;
 }
 
-method width {
-    return Term::Caca::_get_event_resize_width( $self->_event );
+sub width {
+    return Term::Caca::_get_event_resize_width( $_[0]->_event );
 }
 
-method height {
-    return Term::Caca::_get_event_resize_height( $self->_event );
+sub height {
+    return Term::Caca::_get_event_resize_height( $_[0]->_event );
 }
 
-method size {
-    return( $self->width, $self->height );
+sub size {
+    return( $_[0]->width, $_[0]->height );
 }
 
 1;

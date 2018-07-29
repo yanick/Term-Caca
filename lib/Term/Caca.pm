@@ -66,6 +66,14 @@ $ffi->attach( 'caca_draw_ellipse' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void
 $ffi->attach( 'caca_draw_thin_ellipse' => ['opaque', ( 'int' ) x 4 ] => 'void' );
 $ffi->attach( 'caca_draw_circle' => ['opaque', ( 'int' ) x 3, 'char' ] => 'void' );
 
+$ffi->attach( 'caca_draw_polyline' => ['opaque', 'int[]', 'int[]', 'int', 'char' ] => 'void' );
+$ffi->attach( 'caca_draw_thin_polyline' => ['opaque', 'int[]', 'int[]', 'int' ] => 'void' );
+
+$ffi->attach( 'caca_draw_line' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
+$ffi->attach( 'caca_draw_thin_line' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
+
+$ffi->attach( 'caca_get_canvas_width' => ['opaque'] => 'int' );
+$ffi->attach( 'caca_get_canvas_height' => ['opaque'] => 'int' );
 
 our @EXPORT_OK;
 our %EXPORT_TAGS;
@@ -291,6 +299,33 @@ sub text ( $self, $coord, $text ) {
     return $self;
 }
 
+sub polyline( $self, $points, $char = undef, $close = 0 ) {
+    my @x = map { $_->[0] } @$points;
+    my @y = map { $_->[1] } @$points;
+    my $n = @x - !$close;
+
+    $char ? caca_draw_polyline( $self->canvas, \@x, \@y, $n, ord $char )
+          : caca_draw_thin_polyline( $self->canvas, \@x, \@y, $n );
+
+    return $self;
+}
+
+sub line ( $self, $pa, $pb, $char = undef ) {
+    defined ( $char ) 
+    ? caca_draw_line($self->canvas, @$pa, @$pb, ord $char)
+    : caca_draw_thin_line($self->canvas,  @$pa, @$pb );
+
+    return $self;
+}
+
+sub canvas_width($self) {
+  return caca_get_canvas_width($self->canvas);
+}
+
+sub canvas_height($self) {
+  return caca_get_canvas_height($self->canvas);
+}
+
 1;
 
 __END__
@@ -305,9 +340,6 @@ sub canvas_size($self) {
 }
 
 
-sub canvas_width($self) {
-  return _get_width($self->canvas);
-}
 
 
 sub canvas_height($self) {
@@ -404,25 +436,8 @@ sub char ( $self, $coord, $char ) {
 }
 
 
-sub line ( $self, $pa, $pb, $char = undef ) {
-    defined ( $char ) 
-    ?  _draw_line($self->canvas, @$pa, @$pb, $char)
-    : _draw_thin_line($self->canvas,  @$pa, @$pb );
-
-    return $self;
-}
 
 
-sub polyline( $self, $points, $char = undef, $close = 0 ) {
-    my @x = map { $_->[0] } @$points;
-    my @y = map { $_->[1] } @$points;
-    my $n = @x - !$close;
-
-    $char ? _draw_polyline( $self->canvas, \@x, \@y, $n, $char )
-          : _draw_thin_polyline( $self->canvas, \@x, \@y, $n );
-
-    return $self;
-}
 
 
 

@@ -5,23 +5,22 @@ use warnings;
 
 use parent 'Term::Caca::Event';
 use Term::Caca;
-use Method::Signatures;
 
 sub new {
     my $class = shift;
     return bless $class->SUPER::new( @_ ), $class;
 }
 
-method x {
-    return Term::Caca::_get_event_mouse_x( $self->_event );
+sub x {
+    return Term::Caca::_get_event_mouse_x( $_[0]->_event );
 }
 
-method y {
-    return Term::Caca::_get_event_mouse_y( $self->_event );
+sub y {
+    return Term::Caca::_get_event_mouse_y( $_[0]->_event );
 }
 
-method pos {
-    return ( $self->x, $self->y );
+sub pos {
+    return ( $_[0]->x, $_[0]->y );
 }
 
 1;

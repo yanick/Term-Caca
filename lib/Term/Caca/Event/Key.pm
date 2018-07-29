@@ -24,7 +24,6 @@ use strict;
 use warnings;
 
 use parent 'Term::Caca::Event';
-use Method::Signatures;
 
 sub new { 
     my $class = shift;
@@ -38,8 +37,8 @@ Returns the character pressed or released.
 
 =cut
 
-method char {
-    return Term::Caca::_get_event_key_ch( $self->_event );
+sub char {
+    return Term::Caca::_get_event_key_ch( $_[0]->_event );
 }
 
 1;

@@ -3,7 +3,6 @@ requires "Const::Fast" => "0";
 requires "DynaLoader" => "0";
 requires "Exporter" => "0";
 requires "List::MoreUtils" => "0";
-requires "Method::Signatures" => "0";
 requires "Path::Tiny" => "0";
 requires "base" => "0";
 requires "constant" => "0";

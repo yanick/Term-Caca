@@ -52,7 +52,7 @@ pause_and_clear($t);
 
 $t->char([5, 5], 'hello world');
 
-$t->line( [0,0], [25,20], char => 't' );
+$t->line( [0,0], [25,20], 't' );
 $t->line( [5,0], [30,20] );
 pause_and_clear($t);
 

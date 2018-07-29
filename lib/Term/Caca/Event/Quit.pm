@@ -5,7 +5,6 @@ use warnings;
 
 use parent 'Term::Caca::Event';
 use Term::Caca;
-use Method::Signatures;
 
 sub new {
     my $class = shift;
