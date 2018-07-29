@@ -49,8 +49,22 @@ $ffi->attach( 'caca_set_display_time' => [ 'opaque', 'int' ] => 'int' );
 $ffi->attach( 'caca_get_display_time' => [ 'opaque' ] => 'int' );
 $ffi->attach( 'caca_get_canvas' => [ 'opaque' ] => 'opaque' );
 $ffi->attach( 'caca_set_color_argb' => [ 'opaque', 'int' ] => 'opaque' );
-$ffi->attach( 'caca_put_char' => [ 'opaque', 'int', 'int', 'char' ] => 'opaque' );
+$ffi->attach( 'caca_put_char' => [ 'opaque', 'int', 'int', 'char' ] => 'void' );
+$ffi->attach( 'caca_put_str' => [ 'opaque', 'int', 'int', 'string' ] => 'void' );
 $ffi->attach( 'caca_refresh_display' => [ 'opaque' ] => 'opaque' );
+$ffi->attach( 'caca_get_mouse_x' => ['opaque'] => 'int' );
+$ffi->attach( 'caca_get_mouse_y' => ['opaque'] => 'int' );
+$ffi->attach( 'caca_fill_triangle' => ['opaque', ( 'int' ) x 6, 'char' ] => 'void' );
+$ffi->attach( 'caca_draw_triangle' => ['opaque', ( 'int' ) x 6, 'char' ] => 'void' );
+$ffi->attach( 'caca_draw_thin_triangle' => ['opaque', ( 'int' ) x 6 ] => 'void' );
+$ffi->attach( 'caca_clear_canvas' => ['opaque'] => 'void' );
+$ffi->attach( 'caca_fill_box' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
+$ffi->attach( 'caca_draw_box' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
+$ffi->attach( 'caca_draw_thin_box' => ['opaque', ( 'int' ) x 4 ] => 'void' );
+$ffi->attach( 'caca_fill_ellipse' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
+$ffi->attach( 'caca_draw_ellipse' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
+$ffi->attach( 'caca_draw_thin_ellipse' => ['opaque', ( 'int' ) x 4 ] => 'void' );
+$ffi->attach( 'caca_draw_circle' => ['opaque', ( 'int' ) x 3, 'char' ] => 'void' );
 
 
 our @EXPORT_OK;
@@ -161,7 +175,7 @@ has_rw refresh_delay => (
     }
 );
 
-sub refresh ($self) { caca_refresh_display($self->display) }
+sub refresh ($self) { caca_refresh_display($self->display); return $self }
 
 sub rendering_time($self) {
   return caca_get_display_time($self->display)/1_000_000;
@@ -184,37 +198,104 @@ sub _arg_to_color($self,$arg) {
     return hex sprintf "%x%x%x%x", @$arg;
 }
 
-sub put_char ( $self, $coord, $char ) {
+sub char ( $self, $coord, $char ) {
     caca_put_char( $self->canvas, @$coord, ord substr $char, 0, 1 );
+}
+
+sub mouse_position($self) {
+    [ caca_get_mouse_x( $self->display ), caca_get_mouse_y( $self->display ) ];
+}
+
+sub triangle  ( $self, $pa, $pb, $pc, $char = undef, $fill = undef ){
+  $char //= $fill;
+
+  my @args = ( $self->canvas, @$pa, @$pb, @$pc );
+
+  if ( defined $fill ) {
+    caca_fill_triangle(@args, ord $char);
+  }
+  elsif( defined $char ) {
+    caca_draw_triangle(@args, ord $char);
+  }
+  else {
+    caca_draw_thin_triangle(@args);
+  }
+
+  return $self;
+}
+
+sub clear ($self) {
+  caca_clear_canvas($self->canvas);
+  return $self;
+}
+
+sub box  ( $self, $c1, $c2, $char = undef, $fill = undef ){
+  $char //= $fill;
+
+  my @args = ( $self->canvas, @$c1, @$c2 );
+
+  if ( defined $fill ) {
+    caca_fill_box(@args, ord $char);
+  }
+  elsif( defined $char ) {
+    caca_draw_box(@args, ord $char);
+  }
+  else {
+    caca_draw_thin_box(@args);
+  }
+
+  return $self;
+}
+
+sub ellipse ( $self, $center, $rx, $ry, $char = undef, $fill = undef ) {
+    $char //= $fill;
+
+    if ( defined $fill ) {
+        caca_fill_ellipse($self->canvas,@$center,$rx,$ry,ord $char);
+    }
+    elsif( defined $char ) {
+        caca_draw_ellipse($self->canvas,@$center,$rx,$ry,ord $char);
+    }
+    else {
+        caca_draw_thin_ellipse($self->canvas,@$center,$rx,$ry);
+    }
+
+  return $self;
+}
+
+sub circle ( $self, $center, $radius, $char = undef, $fill = undef ) {
+    $char //= $fill;
+
+    my @args = ( $self->canvas, @$center, $radius );
+
+    if ( not defined $char ) {
+        caca_draw_thin_ellipse( @args, $radius );
+    }
+    else {
+        if ( defined $fill ) {
+            caca_fill_ellipse( @args, $radius, ord $char );
+        }
+        else {
+            caca_draw_circle( @args, ord $char );
+        }
+    }
+
+  return $self;
+}
+
+sub text ( $self, $coord, $text ) {
+    length $text > 1 
+        ? caca_put_str( $self->canvas, @$coord, $text )
+        : caca_put_char( $self->canvas, @$coord, ord $text );        
+
+    return $self;
 }
 
 1;
 
 __END__
 
-sub set_title ( $self, $title ) {
-  _set_display_title($self->display, $title);
 
-  return $self;
-}
-
-
-sub refresh($self) {
-  _refresh($self->display);
-  return $self;
-}
-
-
-
-sub rendering_time($self) {
-  return _get_delay($self->display)/1_000_000;
-}
-
-
-sub clear ($self) {
-  _clear($self->canvas);
-  return $self;
-}
 
 
 sub canvas_size($self) {
@@ -235,10 +316,6 @@ sub canvas_height($self) {
 
 
 
-sub mouse_position($self) {
-    my @pos = ( _get_mouse_x( $self->display ), _get_mouse_y( $self->display ) );
-    return wantarray ? @pos : \@pos;
-}
 
 #
 sub get_mouse_x {
@@ -318,13 +395,6 @@ sub DESTROY {
 }
 
 
-sub text ( $self, $coord, $text ) {
-    length $text > 1 
-        ? _putstr( $self->canvas, @$coord, $text )
-        : _putchar( $self->canvas, @$coord, $text );        
-
-    return $self;
-}
 
 
 sub char ( $self, $coord, $char ) {
@@ -355,81 +425,13 @@ sub polyline( $self, $points, $char = undef, $close = 0 ) {
 }
 
 
-sub circle ( $self, $center, $radius, $char = undef, $fill = undef ) {
-    $char //= $fill;
-
-    my @args = ( $self->canvas, @$center, $radius );
-
-    if ( not defined $char ) {
-        _draw_thin_ellipse( @args, $radius );
-    }
-    else {
-        if ( defined $fill ) {
-            _fill_ellipse( @args, $radius, $char );
-        }
-        else {
-            _draw_circle( @args, $char );
-        }
-    }
-
-  return $self;
-}
-
-
-sub ellipse ( $self, $center, $rx, $ry, $char = undef, $fill = undef ) {
-    $char //= $fill;
-
-    if ( defined $fill ) {
-        _fill_ellipse($self->canvas,@$center,$rx,$ry,$char);
-    }
-    elsif( defined $char ) {
-        _draw_ellipse($self->canvas,@$center,$rx,$ry,$char);
-    }
-    else {
-        _draw_thin_ellipse($self->canvas,@$center,$rx,$ry);
-    }
-
-  return $self;
-}
 
 
 
-sub box  ( $self, $center, $width, $height, $char = undef, $fill = undef ){
-  $char //= $fill;
-
-  my @args = ( $self->canvas, @$center, $width, $height );
-
-  if ( defined $fill ) {
-    _fill_box(@args, $char);
-  }
-  elsif( defined $char ) {
-    _draw_box(@args, $char);
-  }
-  else {
-    _draw_thin_box(@args);
-  }
-
-  return $self;
-}
 
 
-sub triangle  ( $self, $pa, $pb, $pc, $char = undef, $fill = undef ){
-  $char //= $fill;
 
-  my @args = ( $self->canvas, @$pa, @$pb, @$pc );
 
-  if ( defined $fill ) {
-    _fill_triangle(@args, $char);
-  }
-  elsif( defined $char ) {
-    _draw_triangle(@args, $char);
-  }
-  else {
-    _draw_thin_triangle(@args);
-  }
-
-  return $self;
-}
 
 
 sub wait_for_event ( $self, $mask = $ANY_EVENT, $timeout = 0 ) {

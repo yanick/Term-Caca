@@ -25,18 +25,18 @@ $t->triangle( [10, 10], [20, 20], [5, 17], char => 't' )
   ->triangle( [14, 10], [24, 20], [9, 17], fill => 'T' );
 pause_and_clear($t);
 
-$t->box( [10, 10], 7, 5, char => 'c' );
-$t->box( [15, 15], 7, 5, fill => '+' );
-$t->box( [20, 20], 7, 5 );
+$t->box( [10, 10], [7, 5], 'c' );
+$t->box( [15, 15], [7, 5], undef, '+' );
+$t->box( [20, 20], [7, 5] );
 pause_and_clear($t);
 
-$t->ellipse( [10, 10], 5, 7, char => 'c' );
-$t->ellipse( [15, 15], 5, 7, fill => '+' );
+$t->ellipse( [10, 10], 5, 7, 'c' );
+$t->ellipse( [15, 15], 5, 7, undef, '+' );
 $t->ellipse( [20, 20], 5, 7 );
 pause_and_clear($t);
 
-$t->circle( [10, 10], 5, char => 'c' );
-$t->circle( [15, 15], 5, fill => '+' );
+$t->circle( [10, 10], 5, 'c' );
+$t->circle( [15, 15], 5, undef, '+' );
 $t->circle( [20, 20], 5 );
 pause_and_clear($t);
 
