@@ -75,6 +75,53 @@ $ffi->attach( 'caca_draw_thin_line' => ['opaque', ( 'int' ) x 4, 'char' ] => 'vo
 $ffi->attach( 'caca_get_canvas_width' => ['opaque'] => 'int' );
 $ffi->attach( 'caca_get_canvas_height' => ['opaque'] => 'int' );
 
+$ffi->attach( 'caca_export_canvas_to_memory' => [ 'opaque', 'string', 'opaque' ]
+        => 'string' );
+
+use FFI::TinyCC;
+ 
+my $tcc = FFI::TinyCC->new;
+ 
+$tcc->compile_string(q/
+  char *
+  caca_export(void *canvas, char *format ) {
+    int size;
+    return caca_export_canvas_to_memory( canvas, format, &size );
+  }
+/);
+ 
+my $address = $tcc->get_symbol('caca_export');
+$ffi->attach([$address => 'caca_export'] => ['opaque', 'string'] => 'string');
+ 
+# my $tcc = FFI::TinyCC->new;
+
+# $tcc->compile_string(q/
+   
+#   char * caca_export(void *canvas, char *format ) {
+#     size_t size;
+
+#     string = caca_export_canvas_to_memory( canvas, format, &size );
+#   }
+
+# /);
+ 
+# SV *
+# _export( canvas, format ) 
+#         void * canvas;
+#         char * format;
+#     CODE:
+#         size_t size;
+#         SV *export;
+#         char *string;
+
+#         string = caca_export_canvas_to_memory( canvas, format, &size );
+#         export = newSVpv( string, size );
+#         RETVAL = export;
+#     OUTPUT:
+#         RETVAL
+
+
+
 our @EXPORT_OK;
 our %EXPORT_TAGS;
 
@@ -326,6 +373,23 @@ sub canvas_height($self) {
   return caca_get_canvas_height($self->canvas);
 }
 
+# TODO: troff seems to trigger a segfault
+my @export_formats = qw/ caca ansi text html html3 irc ps svg tga /;
+
+sub export( $self, $format = 'caca' ) {
+
+    croak "format '$format' not supported"
+        unless grep { $format eq $_ } @export_formats;
+
+    my $export = caca_export_canvas_to_memory( $self->canvas, $format eq 'text' ? 'ansi' : $format, $address );
+
+    no warnings 'uninitialized';
+    $export =~ s/\e\[?.*?[\@-~]//g if $format eq 'text';
+    
+    return $export;
+}
+
+
 1;
 
 __END__
@@ -361,21 +425,6 @@ sub get_mouse_y {
   return _get_mouse_y();
 }
 
-
-# TODO: troff seems to trigger a segfault
-my @export_formats = qw/ caca ansi text html html3 irc ps svg tga /;
-
-
-sub export( $self, $format = 'caca' ) {
-
-    croak "format '$format' not supported" unless $format ~~ @export_formats;
-
-    my $export = _export( $self->canvas, $format eq 'text' ? 'ansi' : $format );
-
-    $export =~ s/\e\[?.*?[\@-~]//g if $format eq 'text';
-    
-    return $export;
-}
 
 
 

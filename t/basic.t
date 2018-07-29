@@ -1,10 +1,15 @@
 use strict;
 use warnings;
 
+# env CACA_DRIVER=x11 TERMCACAPAUSE=1 perl -Ilib t/basic.t for manual
+# testing
+
 use Test::More;
 
 use Term::Caca;
 use Term::Caca::Constants qw/ :all /;
+
+diag "available drivers: ", explain [ Term::Caca->drivers ];
 
 my $driver = $ENV{CACA_DRIVER} || join '', grep { /^null$/ } Term::Caca->drivers;
 
