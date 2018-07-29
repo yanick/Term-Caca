@@ -110,7 +110,9 @@ sub _default_configure_args {
         PERL   => $^X,
     );
 
-    return join ' ', map { "$_=$args{$_}" } sort keys %args;
+    return join ' ', 
+        ( map { '--disable-' . $_ } qw/ ruby java python doc / ),
+        map { "$_=$args{$_}" } sort keys %args;
 }
 
 sub _run {
@@ -160,8 +162,8 @@ sub ACTION_code {
     $self->_run('make')
         or do { warn "building libcaca failed"; return 0 };
 
-#    $self->_run('make install')
-#        or do { warn "installing libcaca in /share failed"; return 0 };
+    $self->_run('make install')
+        or do { warn "installing libcaca in /share failed"; return 0 };
 
     _chdir_back;
 

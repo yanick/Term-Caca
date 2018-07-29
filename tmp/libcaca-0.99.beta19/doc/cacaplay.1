@@ -1,0 +1,26 @@
+.TH cacaplay 1 "2006-11-10" "libcaca"
+.SH NAME
+cacaplay \- play libcaca files
+.SH SYNOPSIS
+.B cacaplay [FILE]
+.RI
+.SH DESCRIPTION
+.B cacaplay
+plays libcaca animation files. These files can be created by any libcaca
+program by setting the
+.B CACA_DRIVER
+environment variable to
+.B "raw"
+and storing the program's standard output.
+
+If no file argument is provided or '\-' is used,
+.B cacaplay
+will read its data from the standard input.
+.SH EXAMPLES
+cacaplay file.caca
+
+CACA_DRIVER=raw CACA_GEOMETRY=80x32 cacademo | cacaplay
+.SH SEE ALSO
+cacaserver(1)
+.SH AUTHOR
+This manual page was written by Sam Hocevar <sam@hocevar.net>.

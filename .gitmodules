@@ -1,0 +1,3 @@
+[submodule "libcaca"]
+	path = libcaca
+	url = git@github.com:cacalabs/libcaca.git

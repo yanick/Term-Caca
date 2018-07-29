@@ -1,0 +1,4 @@
+This a Ruby binding for libcaca.
+
+You can play with it by doing require 'caca' and looking at
+the Caca module, or maybe read the documentation :)
