@@ -443,14 +443,12 @@ sub set_ansi_color( $self, $foreground, $background ) {
 }
 
 sub wait_for_event ( $self, $mask = $ANY_EVENT, $timeout = 0 ) {
-    warn "uh?";
+
   $mask //= $ANY_EVENT;
   $timeout *= 1_000_000 unless $timeout == -1;
-  warn $timeout;
+
   my $event = caca_my_get_event( $self->display, $mask, $timeout, (defined wantarray) ? 1 : 0 )
       or return;
-
-  warn $event;
 
   given ( caca_get_event_type( $event ) ) {
     when ( $KEY_PRESS ) {
