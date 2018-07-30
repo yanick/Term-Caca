@@ -6,7 +6,7 @@ use Test::Exception;
 
 use Term::Caca;
 
-use experimental 'signatures';
+use experimental 'signatures', 'postderef';
 
 my %list = Term::Caca->driver_list->%*;
 

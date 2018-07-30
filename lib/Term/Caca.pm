@@ -122,10 +122,11 @@ $tcc->compile_string(q/
   void caca_free_event(caca_event_t *goner) {
     free(goner);
   }
+
 /);
  
-$ffi->attach( [ $tcc->get_symbol('caca_free_event') => 'caca_free_event' ], ['opaque'], 
-    'void' );
+$ffi->attach( [ $tcc->get_symbol('caca_free_event') => 'caca_free_event' ], ['opaque'], 'void' );
+$ffi->attach( 'caca_free_display', ['opaque'], 'void' );
 
 my $address = $tcc->get_symbol('caca_export');
 $ffi->attach([$address => 'caca_export'] => ['opaque', 'string'] => 'string');
@@ -248,11 +249,14 @@ sub drivers {
 has_ro driver =>
     predicate => 1;
 
-has_ro display => sub($self) {
-    ( $self->has_driver 
-        ? caca_create_display_with_driver(undef,$self->driver)
-        : caca_create_display() ) or croak "couldn't create display";
-};
+has_ro display => 
+    predicate => 1,
+    lazy => 1,
+    default => sub($self) {
+        ( $self->has_driver 
+            ? caca_create_display_with_driver(undef,$self->driver)
+            : caca_create_display() ) or croak "couldn't create display";
+    };
 
 has_ro canvas => sub($self) { caca_get_canvas($self->display) };
 
@@ -479,6 +483,10 @@ sub wait_for_event ( $self, $mask = $ANY_EVENT, $timeout = 0 ) {
 
 }
 
+sub DEMOLISH {
+  my $self = shift;
+  caca_free_display( $self->{display} ) if $self->has_display;
+}
 1;
 
 __END__
@@ -512,9 +520,6 @@ sub get_mouse_y {
 
 
 
-
-
-
 sub set_color( $self, $foreground, $background ) {
     if ( exists $COLORS{uc $foreground} ) {
         return $self->set_ansi_color( 
@@ -526,54 +531,6 @@ sub set_color( $self, $foreground, $background ) {
 
     return $self;
 }
-
-
-
-sub get_feature {
-  my ($self, $feature) = @_;
-  $feature ||= 0;
-  return _get_feature($feature);
-}
-
-#
-sub set_feature {
-  my ($self, $feature) = @_;
-  $feature ||= 0;
-  _get_feature($feature);
-}
-
-#
-sub get_feature_name {
-  my ($self, $feature) = @_;
-  $feature ||= 0;
-  return _get_feature_name($feature);
-}
-
-sub DESTROY {
-    my $self = shift;
-  _free_display( $self->{display} ) if $self->{display};
-}
-
-
-
-
-sub char ( $self, $coord, $char ) {
-    _putchar( $self->canvas, @$coord, substr $char, 0, 1 );
-
-    return $self;
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
