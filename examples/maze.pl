@@ -7,7 +7,7 @@ use Term::Caca qw/ :colors :events /;
 
 my $term = Term::Caca->new;
 
-$term->set_title( 'maze' );
+$term->title( 'maze' );
 
 my( $w, $h ) = $term->canvas_size;
 
@@ -32,15 +32,20 @@ $term->set_color( qw/ RED BLACK / );
 
 my @pos = (1,0);
 
+# TODO work with a coord class
+# TODO compactify the ffi lines and move them in their own modules
+
 while (1) {
     $term->char( \@pos, '@' );
     $term->refresh;
     $term->char( \@pos, '.' );
 
+
     my $event = $term->wait_for_event( 
-        timeout => -1,
-        mask => $KEY_PRESS | $QUIT 
+        $KEY_PRESS | $QUIT,
+        -1,
     );  
+    say "so far so good";
 
     exit if $event->isa( 'Term::Caca::Event::Quit' )
          or $event->char eq 'q';

@@ -44,6 +44,7 @@ $ffi->load_custom_type('::StringPointer' => 'string_pointer');
  
 $ffi->attach( 'caca_get_display_driver_list' => [] => 'string_array' );
 $ffi->attach( 'caca_create_display_with_driver' => [ 'opaque', 'string' ] => 'opaque' );
+$ffi->attach( 'caca_create_display' => [ ] => 'opaque' );
 $ffi->attach( 'caca_set_display_title' => [ 'opaque', 'string' ] => 'int' );
 $ffi->attach( 'caca_set_display_time' => [ 'opaque', 'int' ] => 'int' );
 $ffi->attach( 'caca_get_display_time' => [ 'opaque' ] => 'int' );
@@ -78,10 +79,16 @@ $ffi->attach( 'caca_get_canvas_height' => ['opaque'] => 'int' );
 $ffi->attach( 'caca_export_canvas_to_memory' => [ 'opaque', 'string', 'opaque' ]
         => 'string' );
 
+$ffi->attach( caca_set_color_ansi => [ 'opaque', 'int', 'int' ] => 'void' );
+$ffi->attach( caca_get_event_type => [ 'opaque' ] => 'int' );
+
+
 use FFI::TinyCC;
  
 my $tcc = FFI::TinyCC->new;
- 
+
+$tcc->set_options( Alien::caca->cflags);
+
 $tcc->compile_string(q/
   char *
   caca_export(void *canvas, char *format ) {
@@ -93,6 +100,24 @@ $tcc->compile_string(q/
 my $address = $tcc->get_symbol('caca_export');
 $ffi->attach([$address => 'caca_export'] => ['opaque', 'string'] => 'string');
  
+$tcc->detect_sysinclude_path;
+
+$tcc->compile_string(q/
+    #include <stdint.h>;
+    #include <caca.h>;
+    #include <caca_types.h>;
+
+  void *
+    caca_my_get_event(void *display,int event_mask, int timeout, int want_event ) {
+        caca_event_t * ev;
+        ev = want_event ? malloc( sizeof( caca_event_t ) ) : NULL;
+        caca_get_event(display, event_mask,ev,timeout);
+        return ev;
+  }
+/);
+
+$address = $tcc->get_symbol('caca_my_get_event');
+$ffi->attach([$address => 'caca_my_get_event'] => ['opaque', 'int', 'int', 'int' ] => 'opaque');
 # my $tcc = FFI::TinyCC->new;
 
 # $tcc->compile_string(q/
@@ -120,6 +145,8 @@ $ffi->attach([$address => 'caca_export'] => ['opaque', 'string'] => 'string');
 #     OUTPUT:
 #         RETVAL
 
+our @ISA;
+push @ISA, 'Exporter';
 
 
 our @EXPORT_OK;
@@ -373,6 +400,7 @@ sub canvas_height($self) {
   return caca_get_canvas_height($self->canvas);
 }
 
+
 # TODO: troff seems to trigger a segfault
 my @export_formats = qw/ caca ansi text html html3 irc ps svg tga /;
 
@@ -389,6 +417,55 @@ sub export( $self, $format = 'caca' ) {
     return $export;
 }
 
+sub canvas_size($self) {
+    my @d = ( $self->canvas_width, $self->canvas_height );
+
+    return wantarray ? @d : \@d;
+}
+
+sub set_ansi_color( $self, $foreground, $background ) {
+    caca_set_color_ansi( $self->canvas, $foreground, $background );
+
+    return $self;
+}
+
+sub wait_for_event ( $self, $mask = $ANY_EVENT, $timeout = 0 ) {
+    warn "uh?";
+  $timeout *= 1_000_000 unless $timeout == -1;
+  warn $mask;
+  my $event = caca_my_get_event( $self->display, $mask, $timeout, defined wantarray )
+      or return;
+
+  warn $event;
+
+  given ( caca_get_event_type( $event ) ) {
+    when ( $KEY_PRESS ) {
+        return Term::Caca::Event::Key::Press->new( event => $event );
+    }
+    when ( $KEY_RELEASE ) {
+        return Term::Caca::Event::Key::Release->new( event => $event );
+    }
+    when ( $MOUSE_MOTION ) {
+        return Term::Caca::Event::Mouse::Motion->new( event => $event );
+    }
+    when ( $MOUSE_PRESS ) {
+        return Term::Caca::Event::Mouse::Button::Press->new( event => $event );
+    }
+    when ( $MOUSE_RELEASE ) {
+        return Term::Caca::Event::Mouse::Button::Release->new( event => $event );
+    }
+    when ( $RESIZE ) {
+        return Term::Caca::Event::Resize->new( event => $event );
+    }
+    when ( $QUIT ) {
+        return Term::Caca::Event::Quit->new( event => $event );
+    }
+    default {
+        return;
+    }
+  }
+
+}
 
 1;
 
@@ -397,11 +474,6 @@ __END__
 
 
 
-sub canvas_size($self) {
-    my @d = ( $self->canvas_width, $self->canvas_height );
-
-    return wantarray ? @d : \@d;
-}
 
 
 
@@ -429,11 +501,6 @@ sub get_mouse_y {
 
 
 
-sub set_ansi_color( $self, $foreground, $background ) {
-    _set_ansi_color( $self->canvas, $foreground, $background );
-
-    return $self;
-}
 
 
 sub set_color( $self, $foreground, $background ) {
@@ -498,38 +565,6 @@ sub char ( $self, $coord, $char ) {
 
 
 
-sub wait_for_event ( $self, $mask = $ANY_EVENT, $timeout = 0 ) {
-  my $event = _get_event( $self->display, $mask, int($timeout*1_000_000), defined wantarray )
-      or return;
-
-  given ( _get_event_type( $event ) ) {
-    when ( $KEY_PRESS ) {
-        return Term::Caca::Event::Key::Press->new( event => $event );
-    }
-    when ( $KEY_RELEASE ) {
-        return Term::Caca::Event::Key::Release->new( event => $event );
-    }
-    when ( $MOUSE_MOTION ) {
-        return Term::Caca::Event::Mouse::Motion->new( event => $event );
-    }
-    when ( $MOUSE_PRESS ) {
-        return Term::Caca::Event::Mouse::Button::Press->new( event => $event );
-    }
-    when ( $MOUSE_RELEASE ) {
-        return Term::Caca::Event::Mouse::Button::Release->new( event => $event );
-    }
-    when ( $RESIZE ) {
-        return Term::Caca::Event::Resize->new( event => $event );
-    }
-    when ( $QUIT ) {
-        return Term::Caca::Event::Quit->new( event => $event );
-    }
-    default {
-        return;
-    }
-  }
-
-}
 
 'end of Term::Caca';
 
