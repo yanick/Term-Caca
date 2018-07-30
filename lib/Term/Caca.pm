@@ -11,6 +11,7 @@ our $VERSION = '2.0_0';
 use Carp;
 use Const::Fast;
 use List::MoreUtils qw/ uniq /;
+use List::Util qw/ pairmap /;
 
 use Alien::caca;
 use FFI::Platypus;
@@ -134,34 +135,8 @@ $ffi->attach([$address => 'caca_export'] => ['opaque', 'string'] => 'string');
 my $a2 = $tcc->get_symbol('caca_my_get_event');
 $ffi->attach([$a2 => 'caca_my_get_event'] => ['opaque', 'int', 'int', 'int' ] => 'opaque');
 
-# $tcc->compile_string(q/
-   
-#   char * caca_export(void *canvas, char *format ) {
-#     size_t size;
-
-#     string = caca_export_canvas_to_memory( canvas, format, &size );
-#   }
-
-# /);
- 
-# SV *
-# _export( canvas, format ) 
-#         void * canvas;
-#         char * format;
-#     CODE:
-#         size_t size;
-#         SV *export;
-#         char *string;
-
-#         string = caca_export_canvas_to_memory( canvas, format, &size );
-#         export = newSVpv( string, size );
-#         RETVAL = export;
-#     OUTPUT:
-#         RETVAL
-
 our @ISA;
 push @ISA, 'Exporter';
-
 
 our @EXPORT_OK;
 our %EXPORT_TAGS;
@@ -446,6 +421,16 @@ sub set_ansi_color( $self, $foreground, $background ) {
     return $self;
 }
 
+my %event_map = pairmap { $a => 'Term::Caca::Event::' . $b } (
+     $KEY_PRESS     => 'Key::Press',
+     $KEY_RELEASE   => 'Key::Release',
+     $MOUSE_MOTION  => 'Mouse::Motion',
+     $MOUSE_PRESS   => 'Mouse::Button::Press',
+     $MOUSE_RELEASE => 'Mouse::Button::Release',
+     $RESIZE        => 'Resize',
+     $QUIT          => 'Quit',
+);
+
 sub wait_for_event ( $self, $mask = $ANY_EVENT, $timeout = 0 ) {
 
   $mask //= $ANY_EVENT;
@@ -454,32 +439,9 @@ sub wait_for_event ( $self, $mask = $ANY_EVENT, $timeout = 0 ) {
   my $event = caca_my_get_event( $self->display, $mask, $timeout, (defined wantarray) ? 1 : 0 )
       or return;
 
-  given ( caca_get_event_type( $event ) ) {
-    when ( $KEY_PRESS ) {
-        return Term::Caca::Event::Key::Press->new( event => $event );
-    }
-    when ( $KEY_RELEASE ) {
-        return Term::Caca::Event::Key::Release->new( event => $event );
-    }
-    when ( $MOUSE_MOTION ) {
-        return Term::Caca::Event::Mouse::Motion->new( event => $event );
-    }
-    when ( $MOUSE_PRESS ) {
-        return Term::Caca::Event::Mouse::Button::Press->new( event => $event );
-    }
-    when ( $MOUSE_RELEASE ) {
-        return Term::Caca::Event::Mouse::Button::Release->new( event => $event );
-    }
-    when ( $RESIZE ) {
-        return Term::Caca::Event::Resize->new( event => $event );
-    }
-    when ( $QUIT ) {
-        return Term::Caca::Event::Quit->new( event => $event );
-    }
-    default {
-        return;
-    }
-  }
+  my $class = $event_map{ caca_get_event_type( $event ) } or return;
+
+  return $class->new( event => $event );
 
 }
 
@@ -487,56 +449,7 @@ sub DEMOLISH {
   my $self = shift;
   caca_free_display( $self->{display} ) if $self->has_display;
 }
-1;
+
+'Term::Caca';
 
 __END__
-
-
-
-
-
-
-
-
-sub canvas_height($self) {
-  return _get_height($self->canvas);
-}
-
-
-
-
-#
-sub get_mouse_x {
-# my ($self) = @_;
-  return _get_mouse_x();
-}
-
-#
-sub get_mouse_y {
-# my ($self) = @_;
-  return _get_mouse_y();
-}
-
-
-
-
-sub set_color( $self, $foreground, $background ) {
-    if ( exists $COLORS{uc $foreground} ) {
-        return $self->set_ansi_color( 
-            map { $COLORS{uc $_} } $foreground, $background 
-        );
-    }
-
-    _set_color( $self->canvas, map { _arg_to_color( $_ ) } $foreground, $background );
-
-    return $self;
-}
-
-
-
-
-'end of Term::Caca';
-
-__END__
-
-
