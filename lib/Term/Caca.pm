@@ -81,44 +81,57 @@ $ffi->attach( 'caca_export_canvas_to_memory' => [ 'opaque', 'string', 'opaque' ]
 
 $ffi->attach( caca_set_color_ansi => [ 'opaque', 'int', 'int' ] => 'void' );
 $ffi->attach( caca_get_event_type => [ 'opaque' ] => 'int' );
+$ffi->attach( caca_get_event_key_ch => [ 'opaque' ] => 'char' );
 
+$ffi->attach( caca_get_event_mouse_x => [ 'opaque' ] => 'int' );
+$ffi->attach( caca_get_event_mouse_y => [ 'opaque' ] => 'int' );
+$ffi->attach( caca_get_event_resize_width => [ 'opaque' ] => 'int' );
+$ffi->attach( caca_get_event_resize_height => [ 'opaque' ] => 'int' );
+
+$ffi->attach( caca_get_event_mouse_button => [ 'opaque' ] => 'int' );
 
 use FFI::TinyCC;
  
 my $tcc = FFI::TinyCC->new;
 
 $tcc->set_options( Alien::caca->cflags);
+$tcc->detect_sysinclude_path;
+$tcc->add_symbol( caca_get_event => $ffi->find_symbol( 'caca_get_event' ) );
+
 
 $tcc->compile_string(q/
+  #include <stdint.h>;
+  #include <caca.h>;
+  #include <caca_types.h>;
+
   char *
   caca_export(void *canvas, char *format ) {
     int size;
     return caca_export_canvas_to_memory( canvas, format, &size );
   }
+
+  caca_event_t*
+    caca_my_get_event(void *display, int event_mask, int timeout, int want_event ) {
+        caca_event_t * ev;
+        puts("hi!\n");
+        ev = want_event ? malloc( sizeof( caca_event_t ) ) : NULL;
+        caca_get_event(display, event_mask, ev, timeout);
+        return ev;
+  }
+
+  void caca_free_event(caca_event_t *goner) {
+    free(goner);
+  }
 /);
  
+$ffi->attach( [ $tcc->get_symbol('caca_free_event') => 'caca_free_event' ], ['opaque'], 
+    'void' );
+
 my $address = $tcc->get_symbol('caca_export');
 $ffi->attach([$address => 'caca_export'] => ['opaque', 'string'] => 'string');
  
-$tcc->detect_sysinclude_path;
-
-$tcc->compile_string(q/
-    #include <stdint.h>;
-    #include <caca.h>;
-    #include <caca_types.h>;
-
-  void *
-    caca_my_get_event(void *display,int event_mask, int timeout, int want_event ) {
-        caca_event_t * ev;
-        ev = want_event ? malloc( sizeof( caca_event_t ) ) : NULL;
-        caca_get_event(display, event_mask,ev,timeout);
-        return ev;
-  }
-/);
-
-$address = $tcc->get_symbol('caca_my_get_event');
-$ffi->attach([$address => 'caca_my_get_event'] => ['opaque', 'int', 'int', 'int' ] => 'opaque');
-# my $tcc = FFI::TinyCC->new;
+my $a2 = $tcc->get_symbol('caca_my_get_event');
+$ffi->attach([$a2 => 'caca_my_get_event'] => ['opaque', 'int', 'int', 'int' ] => 'opaque');
 
 # $tcc->compile_string(q/
    
@@ -431,9 +444,10 @@ sub set_ansi_color( $self, $foreground, $background ) {
 
 sub wait_for_event ( $self, $mask = $ANY_EVENT, $timeout = 0 ) {
     warn "uh?";
+  $mask //= $ANY_EVENT;
   $timeout *= 1_000_000 unless $timeout == -1;
-  warn $mask;
-  my $event = caca_my_get_event( $self->display, $mask, $timeout, defined wantarray )
+  warn $timeout;
+  my $event = caca_my_get_event( $self->display, $mask, $timeout, (defined wantarray) ? 1 : 0 )
       or return;
 
   warn $event;

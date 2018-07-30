@@ -13,22 +13,26 @@ use warnings;
 
 use Term::Caca;
 
-sub new {
-    my $self = bless {}, shift;
+use Moose;
 
-    my %args = @_;
+has event => (
+    is => 'ro',
+    required => 1,
+    predicate => 'has_event',
+);
 
-    $self->{event} = $args{event};
+has type => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        ( ref $_[0] ) =~ s/Term::Caca::Event:://r;
+    }
+);
 
-    return $self;
-}
-
-sub _event { $_[0]->{event} }
-
-sub DESTROY {
+sub DEMOLISH {
     my $self = shift;
 
-    Term::Caca::_free_event($self->_event) if $self->_event;
+    Term::Caca::caca_free_event($self->event) if $self->has_event;
 }
 
 1;

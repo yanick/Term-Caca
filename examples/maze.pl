@@ -45,6 +45,7 @@ while (1) {
         $KEY_PRESS | $QUIT,
         -1,
     );  
+    warn $event->char;
     say "so far so good";
 
     exit if $event->isa( 'Term::Caca::Event::Quit' )

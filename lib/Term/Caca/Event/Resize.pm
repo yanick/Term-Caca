@@ -3,25 +3,32 @@ package Term::Caca::Event::Resize;
 use strict;
 use warnings;
 
-use parent 'Term::Caca::Event';
 use Term::Caca;
 
-sub new {
-    my $class = shift;
-    return bless $class->SUPER::new( @_ ), $class;
-}
+use Moose;
+extends 'Term::Caca::Event';
 
-sub width {
-    return Term::Caca::_get_event_resize_width( $_[0]->_event );
-}
+has width => 
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        Term::Caca::caca_get_event_resize_width( $_[0]->event );
+    };
 
-sub height {
-    return Term::Caca::_get_event_resize_height( $_[0]->_event );
-}
+has height => 
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        Term::Caca::caca_get_event_resize_height( $_[0]->event );
+    };
 
-sub size {
-    return( $_[0]->width, $_[0]->height );
-}
+
+has size => 
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        [ $_[0]->width, $_[0]->height ];
+    };
 
 1;
 
