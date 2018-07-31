@@ -134,7 +134,6 @@ $tcc->compile_string(q/
   caca_event_t*
     caca_my_get_event(void *display, int event_mask, int timeout, int want_event ) {
         caca_event_t * ev;
-        puts("hi!\n");
         ev = want_event ? malloc( sizeof( caca_event_t ) ) : NULL;
         caca_get_event(display, event_mask, ev, timeout);
         return ev;

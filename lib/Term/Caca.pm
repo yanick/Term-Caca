@@ -192,6 +192,7 @@ sub clear ($self) {
   return $self;
 }
 
+# TODO same for the other primitives
 sub box  ( $self, $c1, $c2, @rest ){
     @rest = ( thin => 1 ) unless @rest;
     unshift @rest, 'char' if @rest == 1;
