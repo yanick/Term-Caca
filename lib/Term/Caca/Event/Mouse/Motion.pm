@@ -1,4 +1,5 @@
 package Term::Caca::Event::Mouse::Motion;
+# ABSTRACT: event triggered by mouse movements.
 
 use strict;
 use warnings;

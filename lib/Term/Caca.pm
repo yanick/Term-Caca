@@ -12,8 +12,7 @@ use Carp;
 use List::MoreUtils qw/ uniq /;
 use List::Util qw/ pairmap /;
 
-use Alien::caca;
-use FFI::Platypus;
+use Term::Caca::FFI ':all';
 
 use Term::Caca::Event::Key::Press;
 use Term::Caca::Event::Key::Release;
@@ -36,104 +35,6 @@ use experimental qw/
     postderef
 /;
 
-my $ffi = FFI::Platypus->new;
-$ffi->lib(Alien::caca->dynamic_libs);
-
-$ffi->load_custom_type('::StringArray' => 'string_array');
-$ffi->load_custom_type('::StringPointer' => 'string_pointer');
- 
-$ffi->attach( 'caca_get_display_driver_list' => [] => 'string_array' );
-$ffi->attach( 'caca_create_display_with_driver' => [ 'opaque', 'string' ] => 'opaque' );
-$ffi->attach( 'caca_create_display' => [ ] => 'opaque' );
-$ffi->attach( 'caca_set_display_title' => [ 'opaque', 'string' ] => 'int' );
-$ffi->attach( 'caca_set_display_time' => [ 'opaque', 'int' ] => 'int' );
-$ffi->attach( 'caca_get_display_time' => [ 'opaque' ] => 'int' );
-$ffi->attach( 'caca_get_canvas' => [ 'opaque' ] => 'opaque' );
-$ffi->attach( 'caca_set_color_argb' => [ 'opaque', 'int' ] => 'opaque' );
-$ffi->attach( 'caca_put_char' => [ 'opaque', 'int', 'int', 'char' ] => 'void' );
-$ffi->attach( 'caca_put_str' => [ 'opaque', 'int', 'int', 'string' ] => 'void' );
-$ffi->attach( 'caca_refresh_display' => [ 'opaque' ] => 'opaque' );
-$ffi->attach( 'caca_get_mouse_x' => ['opaque'] => 'int' );
-$ffi->attach( 'caca_get_mouse_y' => ['opaque'] => 'int' );
-$ffi->attach( 'caca_fill_triangle' => ['opaque', ( 'int' ) x 6, 'char' ] => 'void' );
-$ffi->attach( 'caca_draw_triangle' => ['opaque', ( 'int' ) x 6, 'char' ] => 'void' );
-$ffi->attach( 'caca_draw_thin_triangle' => ['opaque', ( 'int' ) x 6 ] => 'void' );
-$ffi->attach( 'caca_clear_canvas' => ['opaque'] => 'void' );
-$ffi->attach( 'caca_fill_box' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
-$ffi->attach( 'caca_draw_box' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
-$ffi->attach( 'caca_draw_thin_box' => ['opaque', ( 'int' ) x 4 ] => 'void' );
-$ffi->attach( 'caca_fill_ellipse' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
-$ffi->attach( 'caca_draw_ellipse' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
-$ffi->attach( 'caca_draw_thin_ellipse' => ['opaque', ( 'int' ) x 4 ] => 'void' );
-$ffi->attach( 'caca_draw_circle' => ['opaque', ( 'int' ) x 3, 'char' ] => 'void' );
-
-$ffi->attach( 'caca_draw_polyline' => ['opaque', 'int[]', 'int[]', 'int', 'char' ] => 'void' );
-$ffi->attach( 'caca_draw_thin_polyline' => ['opaque', 'int[]', 'int[]', 'int' ] => 'void' );
-
-$ffi->attach( 'caca_draw_line' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
-$ffi->attach( 'caca_draw_thin_line' => ['opaque', ( 'int' ) x 4, 'char' ] => 'void' );
-
-$ffi->attach( 'caca_get_canvas_width' => ['opaque'] => 'int' );
-$ffi->attach( 'caca_get_canvas_height' => ['opaque'] => 'int' );
-
-$ffi->attach( 'caca_export_canvas_to_memory' => [ 'opaque', 'string', 'opaque' ]
-        => 'string' );
-
-$ffi->attach( caca_set_color_ansi => [ 'opaque', 'int', 'int' ] => 'void' );
-$ffi->attach( caca_get_event_type => [ 'opaque' ] => 'int' );
-$ffi->attach( caca_get_event_key_ch => [ 'opaque' ] => 'char' );
-
-$ffi->attach( caca_get_event_mouse_x => [ 'opaque' ] => 'int' );
-$ffi->attach( caca_get_event_mouse_y => [ 'opaque' ] => 'int' );
-$ffi->attach( caca_get_event_resize_width => [ 'opaque' ] => 'int' );
-$ffi->attach( caca_get_event_resize_height => [ 'opaque' ] => 'int' );
-
-$ffi->attach( caca_get_event_mouse_button => [ 'opaque' ] => 'int' );
-
-use FFI::TinyCC;
- 
-my $tcc = FFI::TinyCC->new;
-
-$tcc->set_options( Alien::caca->cflags);
-$tcc->detect_sysinclude_path;
-$tcc->add_symbol( caca_get_event => $ffi->find_symbol( 'caca_get_event' ) );
-
-
-$tcc->compile_string(q/
-  #include <stdint.h>;
-  #include <caca.h>;
-  #include <caca_types.h>;
-
-  char *
-  caca_export(void *canvas, char *format ) {
-    int size;
-    return caca_export_canvas_to_memory( canvas, format, &size );
-  }
-
-  caca_event_t*
-    caca_my_get_event(void *display, int event_mask, int timeout, int want_event ) {
-        caca_event_t * ev;
-        puts("hi!\n");
-        ev = want_event ? malloc( sizeof( caca_event_t ) ) : NULL;
-        caca_get_event(display, event_mask, ev, timeout);
-        return ev;
-  }
-
-  void caca_free_event(caca_event_t *goner) {
-    free(goner);
-  }
-
-/);
- 
-$ffi->attach( [ $tcc->get_symbol('caca_free_event') => 'caca_free_event' ], ['opaque'], 'void' );
-$ffi->attach( 'caca_free_display', ['opaque'], 'void' );
-
-my $address = $tcc->get_symbol('caca_export');
-$ffi->attach([$address => 'caca_export'] => ['opaque', 'string'] => 'string');
- 
-my $a2 = $tcc->get_symbol('caca_my_get_event');
-$ffi->attach([$a2 => 'caca_my_get_event'] => ['opaque', 'int', 'int', 'int' ] => 'opaque');
-
 our @ISA;
 push @ISA, 'Exporter::Tiny';
 
@@ -143,7 +44,7 @@ our %EXPORT_TAGS;
 our %COLORS;
 
 BEGIN {
-    %COLORS => (
+    %COLORS = (
         BLACK              => 0,
         BLUE               => 1,
         GREEN              => 2,
@@ -234,14 +135,20 @@ sub rendering_time($self) {
   return caca_get_display_time($self->display)/1_000_000;
 }
 
+# TODO fix the colors when they are a constant
 sub set_color( $self, $foreground, $background ) {
-    if ( exists $COLORS{uc $foreground} ) {
-        return $self->set_ansi_color( 
-            map { $COLORS{uc $_} } $foreground, $background 
-        );
+
+    if( ref $foreground or 4 == length $foreground ) {
+        for( $foreground, $background ) {
+            $_ = $self->_arg_to_color($_);
+        }
+        caca_set_color_argb($self->canvas, $foreground, $background );
+    }
+    else {
+        caca_set_color_ansi($self->canvas, $foreground, $background );
     }
 
-    caca_set_color_argb($self->canvas,map { $self->_arg_to_color( $_ ) } $foreground, $background );
+    return $self;
 }
 
 sub _arg_to_color($self,$arg) {
@@ -251,8 +158,11 @@ sub _arg_to_color($self,$arg) {
     return hex sprintf "%x%x%x%x", @$arg;
 }
 
-sub char ( $self, $coord, $char ) {
-    caca_put_char( $self->canvas, @$coord, ord substr $char, 0, 1 );
+sub char ( $self, $coord, $char = undef ) {
+    if( defined $char ) {
+        caca_put_char( $self->canvas, @$coord, ord $char );
+    }
+    return $self;
 }
 
 sub mouse_position($self) {
@@ -379,7 +289,7 @@ sub export( $self, $format = 'caca' ) {
     croak "format '$format' not supported"
         unless grep { $format eq $_ } @export_formats;
 
-    my $export = caca_export_canvas_to_memory( $self->canvas, $format eq 'text' ? 'ansi' : $format, $address );
+    my $export = caca_export( $self->canvas, $format eq 'text' ? 'ansi' : $format );
 
     no warnings 'uninitialized';
     $export =~ s/\e\[?.*?[\@-~]//g if $format eq 'text';
@@ -390,7 +300,7 @@ sub export( $self, $format = 'caca' ) {
 sub canvas_size($self) {
     my @d = ( $self->canvas_width, $self->canvas_height );
 
-    return wantarray ? @d : \@d;
+    return \@d;
 }
 
 sub set_ansi_color( $self, $foreground, $background ) {

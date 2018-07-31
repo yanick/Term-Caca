@@ -5,11 +5,17 @@ use 5.12.0;
 use Games::Maze;
 use Term::Caca qw/ :colors :events /;
 
+use experimental qw/
+    signatures
+    postderef
+    smartmatch
+/;
+
 my $term = Term::Caca->new;
 
 $term->title( 'maze' );
 
-my( $w, $h ) = $term->canvas_size;
+my( $w, $h ) = $term->canvas_size->@*;
 
 # generate the maze
 my $maze = Games::Maze->new( 
@@ -20,7 +26,7 @@ $maze->make;
 my @maze = map { [ split '' ] }  split "\n", $maze->to_ascii;
 
 # display the maze itself
-$term->set_color( qw/ LIGHTBLUE BLACK / );
+$term->set_color( LIGHTBLUE, BLACK );
 for my $x ( 0..$w ) {
     for my $y ( 0..$h ) {
         $term->char( [$x, $y], $maze[$y][$x] );
@@ -28,25 +34,21 @@ for my $x ( 0..$w ) {
 }
 
 
-$term->set_color( qw/ RED BLACK / );
+$term->set_color( RED, BLACK );
 
 my @pos = (1,0);
 
 # TODO work with a coord class
-# TODO compactify the ffi lines and move them in their own modules
 
 while (1) {
     $term->char( \@pos, '@' );
     $term->refresh;
     $term->char( \@pos, '.' );
 
-
     my $event = $term->wait_for_event( 
-        $KEY_PRESS | $QUIT,
+        KEY_PRESS | QUIT,
         -1,
     );  
-    warn $event->char;
-    say "so far so good";
 
     exit if $event->isa( 'Term::Caca::Event::Quit' )
          or $event->char eq 'q';

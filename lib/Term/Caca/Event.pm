@@ -6,6 +6,18 @@ package Term::Caca::Event;
 This class is inherited by the C<Term::Caca::Event::*>
 classes, and shouldn't be used directly.
 
+=head1 ATTRIBUTES
+
+=head2 event 
+
+Required. The underlying caca event structure.
+
+=head2 type 
+
+Holds the name of the event (which is the 
+name of the class without the 
+leading C<Term::Caca::Event::>.
+
 =cut
 
 use strict;
