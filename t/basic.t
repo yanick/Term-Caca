@@ -5,9 +5,9 @@ use warnings;
 # testing
 
 use Test::More;
+use Test::Approx;
 
-use Term::Caca;
-use Term::Caca::Constants qw/ :all /;
+use Term::Caca qw/ :colors /;
 
 diag "available drivers: ", explain [ Term::Caca->drivers ];
 
@@ -19,9 +19,7 @@ my $t = Term::Caca->new( driver => $driver );
 
 $t->title( __FILE__ )->refresh_delay( 1 );
 
-diag $t->rendering_time;
-
-$t->set_color( [ 15, 15, 0, 0 ], 'ffff' );
+$t->set_color( RED, BLACK );
 
 $t->mouse_position;
 
@@ -37,12 +35,12 @@ $t->box( [5, 5], [7, 5], char => '-', fill => '*' );
 pause_and_clear($t);
 
 $t->ellipse( [10, 10], 5, 7, 'c' );
-$t->ellipse( [15, 15], 5, 7, undef, '+' );
+$t->ellipse( [15, 15], 5, 7, fill => '+' );
 $t->ellipse( [20, 20], 5, 7 );
 pause_and_clear($t);
 
 $t->circle( [10, 10], 5, 'c' );
-$t->circle( [15, 15], 5, undef, '+' );
+$t->circle( [15, 15], 5, fill => '+' );
 $t->circle( [20, 20], 5 );
 pause_and_clear($t);
 
@@ -70,8 +68,7 @@ my $render_time = $t->rendering_time;
 
 # render time should be ~ 1 second
 
-cmp_ok $render_time, '>=', 0.5, 'render time around a second';
-cmp_ok $render_time, '<=', 1.5, 'render time around a second';
+is_approx $render_time, 1, 'render time around 1s', '0.5';
 
 pass 'reached the end';
 

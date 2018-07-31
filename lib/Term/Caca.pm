@@ -110,7 +110,7 @@ has_ro display =>
     default => sub($self) {
         ( $self->has_driver 
             ? caca_create_display_with_driver(undef,$self->driver)
-            : caca_create_display() ) or croak "couldn't create display";
+            : caca_create_display(undef) ) or croak "couldn't create display";
     };
 
 has_ro canvas => sub($self) { caca_get_canvas($self->display) };
@@ -129,7 +129,12 @@ has_rw refresh_delay => (
     }
 );
 
-sub refresh ($self) { caca_refresh_display($self->display); return $self }
+sub refresh ($self) { 
+    warn "a";
+    caca_refresh_display($self->display);
+    warn "b";
+    return $self 
+}
 
 sub rendering_time($self) {
   return caca_get_display_time($self->display)/1_000_000;
@@ -142,6 +147,7 @@ sub set_color( $self, $foreground, $background ) {
         for( $foreground, $background ) {
             $_ = $self->_arg_to_color($_);
         }
+        warn "XXX", $foreground;
         caca_set_color_argb($self->canvas, $foreground, $background );
     }
     else {
@@ -192,58 +198,53 @@ sub clear ($self) {
   return $self;
 }
 
-# TODO same for the other primitives
-sub box  ( $self, $c1, $c2, @rest ){
+sub _expand_drawing_options( $self, @rest ) {
     @rest = ( thin => 1 ) unless @rest;
     unshift @rest, 'char' if @rest == 1;
 
-    my %opt = @rest;
-
-  my @args = ( $self->canvas, @$c1, @$c2 );
-
-  caca_fill_box(@args, ord $opt{fill}) if $opt{fill};
-
-  caca_draw_box(@args, ord $opt{char}) if $opt{char};
-
-  caca_draw_thin_box(@args) if $opt{thin};
-
-  return $self;
+    return @rest;
 }
 
-sub ellipse ( $self, $center, $rx, $ry, $char = undef, $fill = undef ) {
-    $char //= $fill;
+sub _primitive ( $self, $funcs, $args, @rest ) {
+    my %opt = $self->_expand_drawing_options(@rest);
+    my( $draw, $thin, $fill ) = @$funcs;
 
-    if ( defined $fill ) {
-        caca_fill_ellipse($self->canvas,@$center,$rx,$ry,ord $fill);
-    }
-    elsif( defined $char ) {
-        caca_draw_ellipse($self->canvas,@$center,$rx,$ry,ord $char);
-    }
-    else {
-        caca_draw_thin_ellipse($self->canvas,@$center,$rx,$ry);
-    }
+    my @args = ( $self->canvas, @$args );
 
-  return $self;
+    $fill->(@args, ord $opt{fill}) if $opt{fill};
+
+    $draw->(@args, ord $opt{char}) if $opt{char};
+
+    $thin->(@args) if $opt{thin};
+
+    return $self;
 }
 
-sub circle ( $self, $center, $radius, $char = undef, $fill = undef ) {
-    $char //= $fill;
+# TODO same for the other primitives
+sub box  ( $self, $c1, $c2, @rest ){
 
-    my @args = ( $self->canvas, @$center, $radius );
+  $self->_primitive(
+      [ \&caca_draw_box, \&caca_draw_thin_box, \&caca_fill_box ],
+      [ @$c1, @$c2 ],
+      @rest,
+  );
 
-    if ( not defined $char ) {
-        caca_draw_thin_ellipse( @args, $radius );
-    }
-    else {
-        if ( defined $fill ) {
-            caca_fill_ellipse( @args, $radius, ord $char );
-        }
-        else {
-            caca_draw_circle( @args, ord $char );
-        }
-    }
+}
 
-  return $self;
+sub ellipse ( $self, $center, $rx, $ry, @rest ) {
+  $self->_primitive(
+      [ \&caca_draw_ellipse, \&caca_draw_thin_ellipse, \&caca_fill_ellipse ],
+      [ @$center, $rx, $ry ],
+      @rest,
+  );
+}
+
+sub circle ( $self, $center, $radius, @rest ) {
+  $self->_primitive(
+      [ \&caca_draw_ellipse, \&caca_draw_thin_ellipse, \&caca_fill_ellipse ],
+      [ @$center, $radius, $radius ],
+      @rest,
+  );
 }
 
 sub text ( $self, $coord, $text ) {
@@ -254,18 +255,21 @@ sub text ( $self, $coord, $text ) {
     return $self;
 }
 
-sub polyline( $self, $points, $char = undef, $close = 0 ) {
+sub polyline( $self, $points, @rest ) {
+    my %opts = $self->_expand_drawing_options(@rest);
+
     my @x = map { $_->[0] } @$points;
     my @y = map { $_->[1] } @$points;
-    my $n = @x - !$close;
+    my $n = @x - !$opts{close};
 
-    $char ? caca_draw_polyline( $self->canvas, \@x, \@y, $n, ord $char )
+    $opts{char} ? caca_draw_polyline( $self->canvas, \@x, \@y, $n, ord $opts{char} )
           : caca_draw_thin_polyline( $self->canvas, \@x, \@y, $n );
 
     return $self;
 }
 
 sub line ( $self, $pa, $pb, $char = undef ) {
+
     defined ( $char ) 
     ? caca_draw_line($self->canvas, @$pa, @$pb, ord $char)
     : caca_draw_thin_line($self->canvas,  @$pa, @$pb );
@@ -471,27 +475,7 @@ This function is not reliable if the ncurses or S-Lang
 drivers are being used, because mouse position is only detected whe
 the mouse is clicked. Other drivers such as X11 work well.
 
-=head2 Import/Export
-
-=head3 import( $drawing, :$format => 'auto' )
-
-TODO
-
-Imports the drawing. The supported formats are
-
-=over
-
-=item "auto": try to guess the format.
-
-=item  "caca": native libcaca files.
-
-=item  "ansi": ANSI art (CP437 charset with ANSI colour codes).
-
-=item  "text": ASCII text file.
-
-=item  "utf8": UTF-8 text with ANSI color codes.
-
-=back
+=head2 Export
 
 =head3 export( $format )
 

@@ -11,7 +11,7 @@ use experimental qw/
     smartmatch
 /;
 
-my $term = Term::Caca->new;
+my $term = Term::Caca->new();
 
 $term->title( 'maze' );
 

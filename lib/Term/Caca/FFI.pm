@@ -16,6 +16,7 @@ use FFI::TinyCC;
 use Exporter::Shiny qw/
     caca_clear_canvas
     caca_create_display
+    caca_create_canvas
     caca_create_display_with_driver
     caca_draw_box
     caca_draw_circle
@@ -66,7 +67,8 @@ $ffi->load_custom_type('::StringArray' => 'string_array');
  
 $ffi->attach( 'caca_get_display_driver_list' => [] => 'string_array' );
 $ffi->attach( 'caca_create_display_with_driver' => [ 'opaque', 'string' ] => 'opaque' );
-$ffi->attach( 'caca_create_display' => [ ] => 'opaque' );
+$ffi->attach( 'caca_create_display' => [ 'opaque' ] => 'opaque' );
+$ffi->attach( 'caca_create_canvas' => [ 'int', 'int'] => 'opaque' );
 $ffi->attach( 'caca_set_display_title' => [ 'opaque', 'string' ] => 'int' );
 $ffi->attach( 'caca_set_display_time' => [ 'opaque', 'int' ] => 'int' );
 $ffi->attach( 'caca_get_display_time' => [ 'opaque' ] => 'int' );
@@ -112,18 +114,17 @@ $ffi->attach( caca_get_event_resize_height => [ 'opaque' ] => 'int' );
 
 $ffi->attach( caca_get_event_mouse_button => [ 'opaque' ] => 'int' );
 
- 
 my $tcc = FFI::TinyCC->new;
 
 $tcc->set_options( Alien::caca->cflags);
 $tcc->detect_sysinclude_path;
-$tcc->add_symbol( caca_get_event => $ffi->find_symbol( 'caca_get_event' ) );
 
+$tcc->add_file($_) for (Alien::caca->dynamic_libs)[0];
+
+#$tcc->add_symbol( caca_get_event => $ffi->find_symbol( 'caca_get_event' ) );
 
 $tcc->compile_string(q/
-  #include <stdint.h>;
   #include <caca.h>;
-  #include <caca_types.h>;
 
   char *
   caca_export(void *canvas, char *format ) {
