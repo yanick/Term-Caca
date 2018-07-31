@@ -117,7 +117,7 @@ $ffi->attach( caca_get_event_mouse_button => [ 'opaque' ] => 'int' );
 my $tcc = FFI::TinyCC->new;
 
 $tcc->set_options( Alien::caca->cflags);
-$tcc->detect_sysinclude_path;
+die $tcc->detect_sysinclude_path;
 
 $tcc->add_file($_) for (Alien::caca->dynamic_libs)[0];
 

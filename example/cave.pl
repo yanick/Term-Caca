@@ -75,8 +75,6 @@ while() {
     warn $term->display;
     $term->refresh;
     warn 3;
-    sleep 3;
-    exit;
 
     my $event = $term->wait_for_event( 
         KEY_PRESS | QUIT,
