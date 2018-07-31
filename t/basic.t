@@ -31,8 +31,9 @@ $t->triangle( [10, 10], [20, 20], [5, 17], char => 't' )
 pause_and_clear($t);
 
 $t->box( [10, 10], [7, 5], 'c' );
-$t->box( [15, 15], [7, 5], undef, '+' );
+$t->box( [15, 15], [7, 5], fill => '+' );
 $t->box( [20, 20], [7, 5] );
+$t->box( [5, 5], [7, 5], char => '-', fill => '*' );
 pause_and_clear($t);
 
 $t->ellipse( [10, 10], 5, 7, 'c' );

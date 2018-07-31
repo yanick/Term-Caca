@@ -8,3 +8,4 @@ lib/Term/Caca.c
 _build
 MYMETA.yml
 lib/Term/Caca.o
+.envrc
