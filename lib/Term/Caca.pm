@@ -14,6 +14,7 @@ use List::Util qw/ pairmap /;
 
 use FFI::Platypus::Memory;
 use Term::Caca::FFI ':all';
+use Term::Caca::Constants qw/ :colors :events /;
 
 use Term::Caca::Event::Key::Press;
 use Term::Caca::Event::Key::Release;
@@ -26,6 +27,7 @@ use Term::Caca::Event::Quit;
 use Moose;
 
 use MooseX::Attribute::Chained;
+
 use MooseX::MungeHas { 
     has_ro => [ 'is_ro' ], 
     has_rw => [ 'is_rw' ], 
@@ -36,10 +38,6 @@ use experimental qw/
     postderef
 /;
 
-our @ISA;
-push @ISA, 'Exporter::Tiny';
-
-use Term::Caca::Constants qw/ :colors :events /;
 
 sub driver_list {
     +{ caca_get_display_driver_list()->@* } 

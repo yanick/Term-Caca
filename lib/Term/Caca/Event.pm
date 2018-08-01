@@ -25,8 +25,6 @@ use warnings;
 
 use FFI::Platypus::Memory;
 
-use Term::Caca;
-
 use Moose;
 
 has event => (
