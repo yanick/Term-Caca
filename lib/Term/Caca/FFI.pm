@@ -1,12 +1,7 @@
 package Term::Caca::FFI;
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: ffi bindings to libcaca 
-
-=head1 DESCRIPTION 
-
-Internal bindings to the libcaca functions. Nothing
-interesting to see here for users.
-
-=cut 
+$Term::Caca::FFI::VERSION = '3.0.0';
 
 use 5.20.0;
 
@@ -123,3 +118,46 @@ sub UINT_SIZE {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Caca::FFI - ffi bindings to libcaca 
+
+=head1 VERSION
+
+version 3.0.0
+
+=head1 DESCRIPTION 
+
+Internal bindings to the libcaca functions. Nothing
+interesting to see here for users.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut

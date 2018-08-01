@@ -1,6 +1,7 @@
 package Term::Caca::Event::Mouse::Motion;
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: event triggered by mouse movements.
-
+$Term::Caca::Event::Mouse::Motion::VERSION = '3.0.0';
 use strict;
 use warnings;
 
@@ -26,3 +27,41 @@ has pos =>
     default => sub { [ $_[0]->x, $_[0]->y ] };
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Caca::Event::Mouse::Motion - event triggered by mouse movements.
+
+=head1 VERSION
+
+version 3.0.0
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut

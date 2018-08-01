@@ -1,24 +1,7 @@
 package Term::Caca::Event;
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: base class for Term::Caca events
-
-=head1 DESCRIPTION
-
-This class is inherited by the C<Term::Caca::Event::*>
-classes, and shouldn't be used directly.
-
-=head1 ATTRIBUTES
-
-=head2 event 
-
-Required. The underlying caca event structure.
-
-=head2 type 
-
-Holds the name of the event (which is the 
-name of the class without the 
-leading C<Term::Caca::Event::>.
-
-=cut
+$Term::Caca::Event::VERSION = '3.0.0';
 
 use strict;
 use warnings;
@@ -49,3 +32,57 @@ sub DEMOLISH {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Caca::Event - base class for Term::Caca events
+
+=head1 VERSION
+
+version 3.0.0
+
+=head1 DESCRIPTION
+
+This class is inherited by the C<Term::Caca::Event::*>
+classes, and shouldn't be used directly.
+
+=head1 ATTRIBUTES
+
+=head2 event 
+
+Required. The underlying caca event structure.
+
+=head2 type 
+
+Holds the name of the event (which is the 
+name of the class without the 
+leading C<Term::Caca::Event::>.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut
