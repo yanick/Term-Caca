@@ -22,13 +22,10 @@ Generated when a key is pressed.
 
 use strict;
 use warnings;
-use parent 'Term::Caca::Event::Key';
 
-sub new { 
-    my $class = shift;
-    my $self = Term::Caca::Event::Key->new( @_ );
-    return bless $self, $class;
-}
+use Moose;
+extends 'Term::Caca::Event::Key';
+
 
 =method char()
 

@@ -6,30 +6,47 @@ package Term::Caca::Event;
 This class is inherited by the C<Term::Caca::Event::*>
 classes, and shouldn't be used directly.
 
+=head1 ATTRIBUTES
+
+=head2 event 
+
+Required. The underlying caca event structure.
+
+=head2 type 
+
+Holds the name of the event (which is the 
+name of the class without the 
+leading C<Term::Caca::Event::>.
+
 =cut
 
 use strict;
 use warnings;
 
-use Method::Signatures;
+use FFI::Platypus::Memory;
+
 use Term::Caca;
 
-sub new {
-    my $self = bless {}, shift;
+use Moose;
 
-    my %args = @_;
+has event => (
+    is => 'ro',
+    required => 1,
+    predicate => 'has_event',
+);
 
-    $self->{event} = $args{event};
+has type => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        ( ref $_[0] ) =~ s/Term::Caca::Event:://r;
+    }
+);
 
-    return $self;
-}
-
-method _event { $self->{event} }
-
-sub DESTROY {
+sub DEMOLISH {
     my $self = shift;
 
-    Term::Caca::_free_event($self->_event) if $self->_event;
+    free $self->event if $self->has_event;
 }
 
 1;

@@ -3,23 +3,21 @@ package Term::Caca::Event::Mouse::Button;
 use strict;
 use warnings;
 
-use parent 'Term::Caca::Event';
 use Term::Caca;
-use Method::Signatures;
 
-sub new {
-    my $class = shift;
-    return bless $class->SUPER::new( @_ ), $class;
-}
+use Moose;
+extends 'Term::Caca::Event';
 
-method index {
-    return Term::Caca::_get_event_mouse_button( $self->_event );
-}
+has index =>
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        Term::Caca::caca_get_event_mouse_button( $_[0]->event );
+    };
 
-method left { return 1 == $self->index }
-method right { return 3 == $self->index }
-method middle { return 2 == $self->index }
-
+sub left { return 1 == $_[0]->index }
+sub right { return 3 == $_[0]->index }
+sub middle { return 2 == $_[0]->index }
 
 1;
 

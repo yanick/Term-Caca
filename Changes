@@ -1,6 +1,9 @@
 Revision history for Term::Caca
 
 {{$NEXT}}
+    [API CHANGES]  
+        * Massive update moving the package to Moose and
+            using Alien::caca for the library building.
 
 2.0_0     2013-03-02
     [API CHANGES]  
