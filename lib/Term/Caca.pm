@@ -6,8 +6,6 @@ use strict;
 use warnings;
 no warnings qw/ uninitialized /;
 
-our $VERSION = '2.0_0';
-
 use Carp;
 use List::MoreUtils qw/ uniq /;
 use List::Util qw/ pairmap /;
