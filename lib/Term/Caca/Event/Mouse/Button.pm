@@ -3,8 +3,6 @@ package Term::Caca::Event::Mouse::Button;
 use strict;
 use warnings;
 
-use Term::Caca;
-
 use Moose;
 extends 'Term::Caca::Event';
 
