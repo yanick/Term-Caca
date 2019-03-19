@@ -9,7 +9,8 @@ Revision history for Term::Caca
 
   [ ENHANCEMENTS ]
 
-  [ NEW FEATURES ]
+  [ MISC ]
+  - remove dependency to Test::Approx [GH#4]
 
   [ STATISTICS ]
 
