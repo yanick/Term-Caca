@@ -4,6 +4,8 @@ Revision history for Term::Caca
   [ API CHANGES ]
 
   [ BUG FIXES ]
+    - Remove stale example/cave.pl file using old exports
+        (GH#6, José Joaquín Atria)
 
   [ DOCUMENTATION ]
 
