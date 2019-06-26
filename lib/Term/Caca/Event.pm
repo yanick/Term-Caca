@@ -20,17 +20,14 @@ leading C<Term::Caca::Event::>.
 
 =cut
 
-use strict;
-use warnings;
+use Moo;
 
 use FFI::Platypus::Memory;
-
-use Moose;
 
 has event => (
     is => 'ro',
     required => 1,
-    predicate => 'has_event',
+    predicate => 1,
 );
 
 has type => (
@@ -48,4 +45,3 @@ sub DEMOLISH {
 }
 
 1;
-

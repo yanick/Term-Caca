@@ -1,14 +1,10 @@
 package Term::Caca::Event::Mouse::Motion;
 # ABSTRACT: event triggered by mouse movements.
 
-use strict;
-use warnings;
-
-use Term::Caca;
-
-use Moose;
+use Moo;
 extends 'Term::Caca::Event';
 
+use Term::Caca;
 
 has x => 
     is => 'ro',
