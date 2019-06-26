@@ -8,6 +8,7 @@ Revision history for Term::Caca
         (GH#6, José Joaquín Atria)
 
   [ DOCUMENTATION ]
+  - Document missing constants and tags. (GH#7, José Joaquín Atria)
 
   [ ENHANCEMENTS ]
 
