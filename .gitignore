@@ -9,3 +9,4 @@ _build
 MYMETA.yml
 lib/Term/Caca.o
 .envrc
+tags
