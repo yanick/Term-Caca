@@ -20,13 +20,8 @@ Generated when a key is pressed or released.
 
 =cut
 
-use strict;
-use warnings;
-
-use Moose;
-
+use Moo;
 extends 'Term::Caca::Event';
-
 
 =method char()
 
