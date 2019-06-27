@@ -12,7 +12,7 @@ use 5.20.0;
 
 use Alien::caca;
 
-use FFI::Platypus;
+use FFI::Platypus 0.88;
 use FFI::TinyCC;
 
 use Exporter::Shiny qw/
