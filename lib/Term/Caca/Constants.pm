@@ -1,6 +1,7 @@
 package Term::Caca::Constants;
+our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: libcaca constants from caca.h
-
+$Term::Caca::Constants::VERSION = '3.1.0';
 use strict;
 use warnings;
 
@@ -227,6 +228,17 @@ use constant {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Caca::Constants - libcaca constants from caca.h
+
+=head1 VERSION
+
+version 3.1.0
 
 =head1 SYNOPSIS
 
@@ -289,3 +301,27 @@ Only import the constants pertaining to events and keys:
   DITHERING_RANDOM
   DITHERING_MIN
   DITHERING_MAX
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019, 2018, 2013, 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut

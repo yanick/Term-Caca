@@ -1,6 +1,7 @@
 package Term::Caca;
+our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: perl interface for libcaca (Colour AsCii Art library)
-
+$Term::Caca::VERSION = '3.1.0';
 use 5.20.0;
 
 use Moo;
@@ -288,6 +289,17 @@ sub DEMOLISH ($self,@) {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Term::Caca - perl interface for libcaca (Colour AsCii Art library)
+
+=head1 VERSION
+
+version 3.1.0
 
 =head1 SYNOPSIS
 
@@ -400,25 +412,25 @@ Supported formats are
 
 =over
 
-=item  "caca": native libcaca files.
+=item "caca": native libcaca files.
 
-=item  "ansi": ANSI art (CP437 charset with ANSI colour codes).
+=item "ansi": ANSI art (CP437 charset with ANSI colour codes).
 
-=item  "text": ASCII text file.
+=item "text": ASCII text file.
 
-=item  "html": an HTML page with CSS information.
+=item "html": an HTML page with CSS information.
 
-=item  "html3": an HTML table that should be compatible with most navigators, including textmode ones.
+=item "html3": an HTML table that should be compatible with most navigators, including textmode ones.
 
-=item  "irc": UTF-8 text with mIRC colour codes.
+=item "irc": UTF-8 text with mIRC colour codes.
 
-=item  "ps": a PostScript document.
+=item "ps": a PostScript document.
 
-=item  "svg": an SVG vector image.
+=item "svg": an SVG vector image.
 
-=item  "tga": a TGA image.
+=item "tga": a TGA image.
 
-=back 
+=back
 
 If no format is provided, defaults to C<caca>.
 
@@ -518,7 +530,6 @@ Returns the invocant object.
 Draws a rectangle of dimensions I<$width> and
 I<$height> with its upper-left corner at I<@top_corner>.
 
-
 Returns the invocant object.
 
 =head3 triangle( \@point_a, \@point_b, \@point_c, @drawing_options )
@@ -527,7 +538,7 @@ Draws a triangle defined by the three given points.
 
 Returns the invocant object.
 
-=head2  Event Handling
+=head2 Event Handling
 
 =head3 wait_for_event( $mask, $timeout )
 
@@ -549,5 +560,27 @@ the method waits forever for an event matching the mask.
 =head1 SEE ALSO
 
 libcaca - L<https://github.com/cacalabs/libcaca> and L<http://caca.zoy.org/>
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+John Beppu <beppu@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019, 2018, 2013, 2011 by John Beppu.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
 
 =cut
