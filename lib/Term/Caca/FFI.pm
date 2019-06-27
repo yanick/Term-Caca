@@ -1,12 +1,12 @@
 package Term::Caca::FFI;
-# ABSTRACT: ffi bindings to libcaca 
+# ABSTRACT: ffi bindings to libcaca
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 Internal bindings to the libcaca functions. Nothing
 interesting to see here for users.
 
-=cut 
+=cut
 
 use 5.20.0;
 
@@ -64,7 +64,7 @@ my $ffi = FFI::Platypus->new;
 $ffi->lib(Alien::caca->dynamic_libs);
 
 $ffi->load_custom_type('::StringArray' => 'string_array');
- 
+
 $ffi->attach( 'caca_get_event' => ['opaque','int','opaque','int'] => 'void' );
 $ffi->attach( 'caca_get_display_driver_list' => [] => 'string_array' );
 $ffi->attach( 'caca_create_display_with_driver' => [ 'opaque', 'string' ] => 'opaque' );
