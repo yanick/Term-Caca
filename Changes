@@ -7,6 +7,7 @@ Revision history for Term::Caca
     - Remove stale example/cave.pl file using old exports
         (GH#6, José Joaquín Atria)
     - Ask for latest Platypus::FFI version. (GH#5)
+    - Remove unused dependency on FFI::TinyCC. (GH#9, José Joaquín Atria)
 
   [ DOCUMENTATION ]
   - Document missing constants and tags. (GH#7, José Joaquín Atria)
