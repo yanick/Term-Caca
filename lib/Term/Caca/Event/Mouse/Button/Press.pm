@@ -7,13 +7,7 @@ Extends L<Term::Caca::Event::Mouse::Button>.
 
 =cut
 
-use strict;
-use warnings;
-
-use Moose;
+use Moo;
 extends qw/ Term::Caca::Event::Mouse::Button /;
 
 1;
-
-
-

@@ -1,9 +1,6 @@
 package Term::Caca::Event::Mouse::Button;
 
-use strict;
-use warnings;
-
-use Moose;
+use Moo;
 extends 'Term::Caca::Event';
 
 has index =>
@@ -18,5 +15,3 @@ sub right { return 3 == $_[0]->index }
 sub middle { return 2 == $_[0]->index }
 
 1;
-
-

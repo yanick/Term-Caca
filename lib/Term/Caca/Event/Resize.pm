@@ -1,11 +1,6 @@
 package Term::Caca::Event::Resize;
 # ABSTRACT: event triggered when the display is resized
 
-use strict;
-use warnings;
-
-use Term::Caca;
-
 =head1 ATTRIBUTES 
 
 =head2 width 
@@ -22,8 +17,10 @@ New size of the display, as an array ref of the width and height.
 
 =cut
 
-use Moose;
+use Moo;
 extends 'Term::Caca::Event';
+
+use Term::Caca;
 
 has width => 
     is => 'ro',
@@ -48,5 +45,3 @@ has size =>
     };
 
 1;
-
-
