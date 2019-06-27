@@ -11,6 +11,7 @@ Revision history for Term::Caca
   - Document missing constants and tags. (GH#7, José Joaquín Atria)
 
   [ ENHANCEMENTS ]
+  - Move distribution to Moo. (GH#8, José Joaquín Atria)
 
   [ NEW FEATURES ]
 
