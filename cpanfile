@@ -4,7 +4,6 @@ requires "Exporter" => "0";
 requires "Exporter::Shiny" => "0";
 requires "FFI::Platypus" => "0";
 requires "FFI::Platypus::Memory" => "0";
-requires "FFI::TinyCC" => "0";
 requires "List::MoreUtils" => "0";
 requires "List::Util" => "0";
 requires "Moose" => "0";
