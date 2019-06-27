@@ -467,14 +467,14 @@ Returns the invocant C<Term::Caca> object.
 The drawing of all primitive is controlled by C<drawing_options>. 
 Unless specified otherwise, the possible options are: 
 
-If no option is given, or if the option C<thin => 1> is given, 
+If no option is given, or if the option C<thin =E<gt> 1> is given,
 the primitive will be drawn using ascii art. 
 
-If a single character or the C<char => $x> pair is given, 
+If a single character or the C<char =E<gt> $x> pair is given,
 then this character  it will be used to trace 
 the primitive.
 
-If C<fill => $y> is given, then that character will be used to 
+If C<fill =E<gt> $y> is given, then that character will be used to
 fill the primitive.
 
 C<fill> and C<char> or C<thin> can be used in combination
