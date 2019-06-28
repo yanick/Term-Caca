@@ -105,7 +105,7 @@ $ffi->attach( 'caca_export_canvas_to_memory' => [ 'opaque', 'string', 'opaque' ]
 
 $ffi->attach( caca_set_color_ansi => [ 'opaque', 'int', 'int' ] => 'void' );
 $ffi->attach( caca_get_event_type => [ 'opaque' ] => 'int' );
-$ffi->attach( caca_get_event_key_ch => [ 'opaque' ] => 'char' );
+$ffi->attach( caca_get_event_key_ch => [ 'opaque' ] => 'int' );
 
 $ffi->attach( caca_get_event_mouse_x => [ 'opaque' ] => 'int' );
 $ffi->attach( caca_get_event_mouse_y => [ 'opaque' ] => 'int' );

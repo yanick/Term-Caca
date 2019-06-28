@@ -27,10 +27,19 @@ extends 'Term::Caca::Event';
 
 Returns the character pressed or released.
 
+=method key()
+
+Returns the key code that was pressed or released.
+
+These will match the values of the constants exported by the C<:keys> tag
+from L<Term::Caca::Constants>.
+
 =cut
 
-sub char {
-    return chr Term::Caca::caca_get_event_key_ch( $_[0]->event );
+sub key {
+    return Term::Caca::caca_get_event_key_ch( $_[0]->event );
 }
+
+sub char { chr shift->key }
 
 1;

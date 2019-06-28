@@ -3,14 +3,10 @@
 use 5.12.0;
 
 use Games::Maze;
-use Term::Caca::Constants qw/ :colors :events /;
+use Term::Caca::Constants qw/ :colors :events :keys /;
 use Term::Caca;
 
-use experimental qw/
-    signatures
-    postderef
-    smartmatch
-/;
+use experimental qw/ postderef /;
 
 my $term = Term::Caca->new();
 
@@ -55,26 +51,24 @@ while (1) {
          or $event->char eq 'q';
 
     # move using the keypad (2, 4, 6, 8)
-    given ( $event->char ) {
-        when ( 2 ) { 
-            if ( $pos[1] < $w and $maze[$pos[1]+1][$pos[0]] eq ' ' ) {
-                $pos[1]++;
-            }
+    if ( $event->char eq 8 || $event->key == KEY_UP ) {
+        if ( $pos[1] > 0 and $maze[$pos[1]-1][$pos[0]] eq ' ' ) {
+            $pos[1]--;
         }
-        when ( 8 ) { 
-            if ( $pos[1] > 0 and $maze[$pos[1]-1][$pos[0]] eq ' ' ) {
-                $pos[1]--;
-            }
+    }
+    elsif ( $event->char eq 2 || $event->key == KEY_DOWN ) {
+        if ( $pos[1] < $w and $maze[$pos[1]+1][$pos[0]] eq ' ' ) {
+            $pos[1]++;
         }
-        when ( 4 ) { 
-            if ( $pos[0] > 0 and $maze[$pos[1]][$pos[0]-1] eq ' ' ) {
-                $pos[0]--;
-            }
+    }
+    elsif ( $event->char eq 4 || $event->key == KEY_LEFT ) {
+        if ( $pos[0] > 0 and $maze[$pos[1]][$pos[0]-1] eq ' ' ) {
+            $pos[0]--;
         }
-        when ( 6 ) { 
-            if ( $pos[0] < $w and $maze[$pos[1]][$pos[0]+1] eq ' ' ) {
-                $pos[0]++;
-            }
+    }
+    elsif ( $event->char eq 6 || $event->key == KEY_RIGHT ) {
+        if ( $pos[0] < $w and $maze[$pos[1]][$pos[0]+1] eq ' ' ) {
+            $pos[0]++;
         }
     }
 }
